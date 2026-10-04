@@ -1,0 +1,23 @@
+[
+  {
+    "case": "Recycled 2020 Curfew",
+    "full_system_verdict": "CONTRADICTED",
+    "ablation_no_alignment_verdict": "CONTRADICTED",
+    "full_confidence": 0.94,
+    "ablation_confidence": 0.94
+  },
+  {
+    "case": "Cheapfake Caption Mismatch",
+    "full_system_verdict": "MISLEADING",
+    "ablation_no_alignment_verdict": "INSUFFICIENT_EVIDENCE",
+    "full_confidence": 0.82,
+    "ablation_confidence": 0.45
+  },
+  {
+    "case": "Verified Exoplanet Discovery",
+    "full_system_verdict": "SUPPORTED",
+    "ablation_no_alignment_verdict": "SUPPORTED",
+    "full_confidence": 0.94,
+    "ablation_confidence": 0.94
+  }
+]

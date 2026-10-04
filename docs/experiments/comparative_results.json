@@ -1,0 +1,14 @@
+{
+  "sample_count": 8,
+  "baseline_text_only": {
+    "binary_accuracy": 0.75,
+    "macro_f1": 0.75
+  },
+  "proposed_evidence_system": {
+    "binary_accuracy": 0.875,
+    "binary_macro_f1": 0.8545,
+    "five_class_accuracy": 0.625,
+    "five_class_macro_f1": 0.4917
+  },
+  "f1_improvement": 0.1045
+}
