@@ -1,8 +1,13 @@
 from fastapi import APIRouter
-from backend.app.schemas.verification import FullVerificationResponse
+from backend.app.api.v1.endpoints.ingest import router as ingest_router
+from backend.app.api.v1.endpoints.jobs import router as jobs_router
 from backend.app.core.config import settings
 
 api_router = APIRouter()
+
+# Mount feature routers
+api_router.include_router(ingest_router)
+api_router.include_router(jobs_router)
 
 
 @api_router.get("/health", tags=["System"])
