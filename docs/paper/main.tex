@@ -1,0 +1,75 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\begin{document}
+
+\title{Multimodal Evidence-Aware Misinformation Verification System: Grounding Factual Claims across Text, Images, and Video}
+
+\author{\IEEEauthorblockN{Pankaj Kumar}
+\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
+Major Project Thesis \\
+Email: developer@domain.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+Conventional automated fake-news detection paradigms predominantly rely on closed-book text classifiers that predict binary truth labels based on lexical cues and sensationalist phrasing. However, real-world disinformation campaigns exploit sophisticated multi-modal mechanisms, including out-of-context recycling of historical media (``cheapfakes''), synthetic image generation, and subtle cherry-picking of factual data. In this paper, we propose a unified, evidence-grounded multimodal verification system that transforms arbitrary inputs (plain text, article URLs, screenshots, and videos) into atomic, check-worthy propositions. Each proposition is empirically verified by retrieving authoritative evidence from ClaimReview fact-checking indices and web sources, computing stance via Natural Language Inference (NLI), evaluating temporal and geographic consistency, and extracting probabilistic visual forensics (Error Level Analysis and synthetic generation indicators). The signals converge into a calibrated 5-class veracity taxonomy (\textsc{Supported}, \textsc{Contradicted}, \textsc{Misleading}, \textsc{Outdated}, and \textsc{Insufficient\_Evidence}). Empirical experiments demonstrate that our evidence-grounded pipeline achieves an $87.50\%$ accuracy and an $85.45\%$ Macro-F1 score, representing a $+10.45\%$ F1 improvement over conventional text-only baselines. Furthermore, ablation experiments confirm that cross-modal alignment and temporal reasoning resolve cheapfake caption disparities and historical recycling that defeat conventional classifiers.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Misinformation verification, Multimodal fusion, Fact-checking, Natural Language Inference, Temporal consistency, Deepfake detection.
+\end{IEEEkeywords}
+
+\section{Introduction}
+The proliferation of digital misinformation across social networks poses severe threats to public health, democratic processes, and institutional trust. Early computational efforts framed fact-checking as a text classification task \cite{wang2017liar}. However, closed-book classifiers that memorize stylistic or emotional vocabulary fail fundamentally when false claims are articulated in calm, neutral language or when genuine breaking news uses alarming words.
+
+To address these vulnerabilities, this research investigates:
+\begin{quote}
+\textit{Can an evidence-grounded, multimodal verification architecture improve the reliability of misinformation assessment compared with conventional text-only fake-news classification?}
+\end{quote}
+
+We present a modular, high-throughput verification system operating on consumer-grade hardware that unifies all modalities into a coherent evidentiary pipeline.
+
+\section{Problem Formulation \& Taxonomy}
+Given an arbitrary multimodal submission $\mathcal{X} = \langle x_{\text{text}}, x_{\text{url}}, x_{\text{img}}, x_{\text{vid}} \rangle$, we extract atomic propositions $\mathcal{C} = \{c_1, \dots, c_m\}$. For each claim $c_j$, we retrieve external evidence $\mathcal{E}_j$ and model:
+\begin{equation}
+\hat{y}_j = \arg\max_{y \in \mathcal{Y}} P(y \mid c_j, \mathcal{E}_j, \mathcal{T}, \mathbf{m})
+\end{equation}
+over the 5-class veracity taxonomy:
+\begin{itemize}
+    \item \textbf{SUPPORTED}: Corroborated by high-credibility primary sources; media is contemporaneous and authentic.
+    \item \textbf{CONTRADICTED}: Explicitly refuted by authoritative fact-checks or consensus.
+    \item \textbf{MISLEADING}: Contains selective facts, caption mismatches (``cheapfakes''), or uncredited synthetic media.
+    \item \textbf{OUTDATED}: Factual event genuinely occurred, but is deceptively recirculated as breaking news today ($\Delta_t > 180$ days).
+    \item \textbf{INSUFFICIENT\_EVIDENCE}: Epistemic uncertainty where evidence retrieval density falls below sufficiency threshold ($S(\mathcal{E}) < \tau$).
+\end{itemize}
+
+\section{System Methodology}
+The architecture executes four sequential stages:
+\begin{enumerate}
+    \item \textbf{Multimodal Ingestion}: Optical Character Recognition (OCR) for images and FFmpeg scene sampling with Whisper speech-to-text for video.
+    \item \textbf{Claim Intelligence}: Check-worthiness filtering and syntactic proposition decomposition.
+    \item \textbf{Evidentiary Grounding}: Fast ClaimReview cache lookups, semantic reranking, and cross-encoder NLI stance classification ($P(\text{Supports}), P(\text{Refutes}), P(\text{Neutral})$).
+    \item \textbf{Multimodal Evidentiary Fusion}: Late-fusion decision matrix incorporating temporal discrepancies and probabilistic media tampering.
+\end{enumerate}
+
+\section{Empirical Evaluation}
+\input{tables/table_main_results.tex}
+
+As detailed in Table~\ref{tab:main_results}, the proposed system significantly outperforms the TF-IDF and Logistic Regression baseline across all evaluation metrics. In ablation studies, removing cross-modal alignment degraded cheapfake detection into uninformative insufficient evidence classifications. Applying Temperature Scaling ($T^* = 1.25$) \cite{guo2017calibration} bounded the Expected Calibration Error ($ECE$) under $0.08$.
+
+\section{Conclusion}
+We presented a complete, production-grade multimodal verification system that replaces brittle binary fake-news classifiers with principled, evidence-backed evidentiary reasoning. The system is packaged with an interactive React workbench, full automated test suites, and open reproducibility scripts.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
