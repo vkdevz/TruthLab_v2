@@ -5,6 +5,7 @@ from backend.app.api.v1.endpoints.baseline import router as baseline_router
 from backend.app.api.v1.endpoints.claims import router as claims_router
 from backend.app.api.v1.endpoints.verify import router as verify_router
 from backend.app.api.v1.endpoints.image import router as image_router
+from backend.app.api.v1.endpoints.video import router as video_router
 from backend.app.core.config import settings
 
 api_router = APIRouter()
@@ -16,6 +17,7 @@ api_router.include_router(baseline_router)
 api_router.include_router(claims_router)
 api_router.include_router(verify_router)
 api_router.include_router(image_router)
+api_router.include_router(video_router)
 
 
 @api_router.get("/health", tags=["System"])
