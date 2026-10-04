@@ -1,23 +1,29 @@
-# Verification Pipeline (Phase 1)
+# Verification Pipeline (Phase 1 & Phase 2)
 
-## End-to-End Pipeline Data Flow
+## End-to-End Multimodal Pipeline Data Flow
 
-The core Phase 1 workflow executes a deterministic six-stage pipeline:
+The unified Phase 2 workflow executes an integrated multimodal pipeline:
 
 ```
-TEXT / URL 
-   ↓ [1. Ingestion & SSRF Defense]
-Normalized Content 
-   ↓ [2. Claim Extraction & Checkworthiness]
+TEXT / URL / IMAGE / VIDEO
+   ↓ [1. Ingestion, Anti-SSRF & Magic Byte Signature Validation]
+Extracted Content: Trafilatura / OCR Normalizer / Whisper ASR
+   ↓ [2. Unified Textual Corpus & Forensic Signal Extraction]
+Unified Corpus + Image/Video Forensics (EXIF, ELA, Synthetic, Probe)
+   ↓ [3. Claim Extraction & Checkworthiness]
 Atomic Claims
-   ↓ [3. Multi-Provider Evidence Retrieval]
+   ↓ [4. Multi-Provider Evidence Retrieval]
 Candidate Evidence Snippets
-   ↓ [4. Hybrid Evidence Ranking]
+   ↓ [5. Hybrid Evidence Ranking]
 Ranked Top-k Evidence
-   ↓ [5. NLI Stance Interpretation]
+   ↓ [6. NLI Stance Interpretation]
 Evidentiary Stances (SUPPORTS / REFUTES / NEUTRAL)
-   ↓ [6. Verdict Precedence Engine & Explanation]
-FullVerificationResponse (Verdict + Confidence + Audit + Graph)
+   ↓ [7. Temporal & Context Analysis]
+Temporal Alignment (CURRENT / HISTORICAL / OUTDATED / UNKNOWN)
+   ↓ [8. Multimodal Late-Fusion Engine]
+Fusion Decision (Refutation Dominance, Cross-Modal Alignment)
+   ↓ [9. Verdict Engine & Explanation]
+FullVerificationResponse (Verdict + Confidence + Forensics + Audit + Graph)
 ```
 
 ---
@@ -96,7 +102,20 @@ FullVerificationResponse (Verdict + Confidence + Audit + Graph)
 
 ---
 
-## 7. Structured Explanation & Audit Trail
+## 7. Multimodal Late-Fusion & Cross-Modal Consistency
+
+When image or video inputs are provided:
+1. **Evidentiary Refutation Dominance**:
+   - If authoritative fact-check evidence directly refutes the claim ($\ge 0.65$), the verdict resolves to `CONTRADICTED`, regardless of low visual anomaly scores.
+2. **Cross-Modal Consistency ("Cheapfake" Detection)**:
+   - Evaluates token alignment between the stated caption/claim and visual OCR text extracted from images/keyframes.
+   - Contradictory pairs (e.g. caption claiming riots vs chyron showing festival) trigger `MISLEADING` with explicit explanatory notes.
+3. **Temporal Outdated Penalty**:
+   - Out-of-context historical media recirculated as breaking news triggers `OUTDATED`.
+
+---
+
+## 8. Structured Explanation & Audit Trail
 
 Every verification response returns:
 - **`overall_veracity`**: One of the 5 taxonomy classes.

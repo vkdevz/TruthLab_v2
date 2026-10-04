@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { 
   VeracityLabel, 
   ClaimVerificationResult,
   ImageForensicIndicators,
-  VideoForensicIndicators 
+  VideoForensicIndicators,
+  FullVerificationResponse 
 } from './types/verification';
 
 interface BenchmarkSample {
@@ -51,6 +52,7 @@ export function App() {
   const [inputText, setInputText] = useState('');
   const [inputUrl, setInputUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressStage, setProgressStage] = useState('');
   const [activeClaimIdx, setActiveClaimIdx] = useState(0);
@@ -61,9 +63,22 @@ export function App() {
   const [verifiedClaims, setVerifiedClaims] = useState<ClaimVerificationResult[]>([]);
   const [imageForensics, setImageForensics] = useState<ImageForensicIndicators | null>(null);
   const [videoForensics, setVideoForensics] = useState<VideoForensicIndicators | null>(null);
+  const [ocrText, setOcrText] = useState<string | null>(null);
+  const [transcriptText, setTranscriptText] = useState<string | null>(null);
   const [executiveSummary, setExecutiveSummary] = useState<string>('');
   const [limitations, setLimitations] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Clean up object URLs to prevent memory leaks
+  useEffect(() => {
+    if (selectedFile) {
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setFilePreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setFilePreviewUrl(null);
+    }
+  }, [selectedFile]);
 
   const handlePresetSelect = (preset: BenchmarkSample) => {
     setActiveTab(preset.modality);
@@ -79,7 +94,7 @@ export function App() {
   const handleVerify = async () => {
     setErrorMsg(null);
     setIsProcessing(true);
-    setProgressStage('Ingesting content...');
+    setProgressStage('Uploading and validating input...');
 
     try {
       if (activeTab === 'TEXT') {
@@ -99,7 +114,7 @@ export function App() {
           throw new Error(errData.detail || 'Verification service error.');
         }
 
-        const data = await res.json();
+        const data: FullVerificationResponse = await res.json();
         setVerifiedClaims(data.claims_verified || []);
         setOverallVerdict(data.overall_veracity);
         setOverallConfidence(data.overall_confidence);
@@ -107,6 +122,8 @@ export function App() {
         setLimitations(data.system_limitations || []);
         setImageForensics(null);
         setVideoForensics(null);
+        setOcrText(null);
+        setTranscriptText(null);
       } else if (activeTab === 'URL') {
         if (!inputUrl.trim()) {
           throw new Error('Please enter a valid HTTP/HTTPS article URL to verify.');
@@ -124,7 +141,7 @@ export function App() {
           throw new Error(errData.detail || 'URL verification failed.');
         }
 
-        const data = await res.json();
+        const data: FullVerificationResponse = await res.json();
         setVerifiedClaims(data.claims_verified || []);
         setOverallVerdict(data.overall_veracity);
         setOverallConfidence(data.overall_confidence);
@@ -132,63 +149,66 @@ export function App() {
         setLimitations(data.system_limitations || []);
         setImageForensics(null);
         setVideoForensics(null);
+        setOcrText(null);
+        setTranscriptText(null);
       } else if (activeTab === 'IMAGE') {
         if (!selectedFile) {
           throw new Error('Please select an image file to upload.');
         }
-        setProgressStage('Running OCR & visual forensics (ELA + synthetic detection)...');
+        setProgressStage('Running OCR & visual forensics (ELA + synthetic indicator)...');
 
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const res = await fetch('http://localhost:8000/api/v1/image/analyze', {
+        const res = await fetch('http://localhost:8000/api/v1/verify/image', {
           method: 'POST',
           body: formData,
         });
 
         if (!res.ok) {
-          throw new Error('Image analysis failed.');
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Image verification failed.');
         }
 
-        const data = await res.json();
-        setImageForensics(data.forensics);
-        setVerifiedClaims(data.verified_claims || []);
-        setExecutiveSummary(data.overall_assessment);
-
-        if (data.verified_claims && data.verified_claims.length > 0) {
-          setOverallVerdict(data.verified_claims[0].veracity);
-          setOverallConfidence(data.verified_claims[0].confidence);
-        } else if (data.forensics.synthetic_probability > 0.75) {
-          setOverallVerdict('MISLEADING');
-          setOverallConfidence(data.forensics.synthetic_probability);
-        } else {
-          setOverallVerdict('SUPPORTED');
-          setOverallConfidence(0.85);
-        }
+        const data: FullVerificationResponse = await res.json();
+        setImageForensics(data.image_forensics || null);
+        setVideoForensics(null);
+        setVerifiedClaims(data.claims_verified || []);
+        setOverallVerdict(data.overall_veracity);
+        setOverallConfidence(data.overall_confidence);
+        setExecutiveSummary(data.executive_summary);
+        setLimitations(data.system_limitations || []);
+        setOcrText(data.ocr_text || null);
+        setTranscriptText(null);
       } else if (activeTab === 'VIDEO') {
         if (!selectedFile) {
           throw new Error('Please select a video file to upload.');
         }
-        setProgressStage('Extracting audio track & sampling scene keyframes...');
+        setProgressStage('Probing video streams, sampling keyframes & extracting audio...');
 
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const res = await fetch('http://localhost:8000/api/v1/video/analyze', {
+        const res = await fetch('http://localhost:8000/api/v1/verify/video', {
           method: 'POST',
           body: formData,
         });
 
         if (!res.ok) {
-          throw new Error('Video verification failed.');
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Video verification failed.');
         }
 
-        const data = await res.json();
-        setVideoForensics(data.forensics);
-        setVerifiedClaims(data.verified_claims || []);
-        setExecutiveSummary(data.overall_assessment);
-        setOverallVerdict('SUPPORTED');
-        setOverallConfidence(0.88);
+        const data: FullVerificationResponse = await res.json();
+        setVideoForensics(data.video_forensics || null);
+        setImageForensics(null);
+        setVerifiedClaims(data.claims_verified || []);
+        setOverallVerdict(data.overall_veracity);
+        setOverallConfidence(data.overall_confidence);
+        setExecutiveSummary(data.executive_summary);
+        setLimitations(data.system_limitations || []);
+        setOcrText(data.ocr_text || null);
+        setTranscriptText(data.transcript_text || null);
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Verification pipeline encountered an error.');
@@ -243,20 +263,20 @@ export function App() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '999px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '12px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-cyan)' }} className="pulsing-glow"></span>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-cyan)', letterSpacing: '0.05em' }}>FINAL-YEAR RESEARCH & ENGINEERING PROJECT</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-cyan)', letterSpacing: '0.05em' }}>PHASE 2 — MULTIMODAL & TEMPORAL INTELLIGENCE</span>
           </div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(135deg, #fff 40%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Multimodal Evidence-Aware Misinformation Verification System
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '6px' }}>
-            Unified evidentiary reasoning across Plain Text, URLs, Screenshots, and Video Media.
+            Unified evidentiary reasoning across Plain Text, URLs, Screenshots, Memes, and Video Media.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <div className="glass-panel" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }}></span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 500 }}>Engine v1.0 Live</span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 500 }}>Multimodal Engine Live</span>
           </div>
         </div>
       </header>
@@ -364,29 +384,52 @@ export function App() {
             </div>
           </div>
         ) : (
-          <div style={{
-            border: '2px dashed var(--border-subtle)',
-            borderRadius: '12px',
-            padding: '36px',
-            textAlign: 'center',
-            background: 'rgba(10, 13, 20, 0.4)',
-          }}>
-            <input
-              type="file"
-              accept={activeTab === 'IMAGE' ? 'image/*' : 'video/*'}
-              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-              id="file-upload"
-              style={{ display: 'none' }}
-            />
-            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-              <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>📁</div>
-              <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--accent-cyan)' }}>
-                {selectedFile ? selectedFile.name : `Click to choose ${activeTab.toLowerCase()} file`}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{
+              border: '2px dashed var(--border-subtle)',
+              borderRadius: '12px',
+              padding: '32px',
+              textAlign: 'center',
+              background: 'rgba(10, 13, 20, 0.4)',
+            }}>
+              <input
+                type="file"
+                accept={activeTab === 'IMAGE' ? 'image/*' : 'video/*'}
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                id="file-upload"
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '8px' }}>
+                  {activeTab === 'IMAGE' ? '🖼️' : '🎬'}
+                </div>
+                <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--accent-cyan)' }}>
+                  {selectedFile ? selectedFile.name : `Click to choose ${activeTab.toLowerCase()} file`}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '4px' }}>
+                  {activeTab === 'IMAGE' ? 'Supported: PNG, JPEG, WEBP, BMP (Max 15MB)' : 'Supported: MP4, MOV, WEBM (Max 60MB, duration <= 90s)'}
+                </div>
+              </label>
+            </div>
+
+            {/* Media Preview Box */}
+            {filePreviewUrl && (
+              <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', padding: '16px', borderRadius: '10px' }}>
+                {activeTab === 'IMAGE' ? (
+                  <img
+                    src={filePreviewUrl}
+                    alt="Upload Preview"
+                    style={{ maxHeight: '240px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}
+                  />
+                ) : (
+                  <video
+                    src={filePreviewUrl}
+                    controls
+                    style={{ maxHeight: '240px', maxWidth: '100%', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}
+                  />
+                )}
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '4px' }}>
-                {activeTab === 'IMAGE' ? 'Supported: PNG, JPEG, WEBP (Max 15MB)' : 'Supported: MP4, MOV, WEBM (Max 60MB)'}
-              </div>
-            </label>
+            )}
           </div>
         )}
 
@@ -422,7 +465,7 @@ export function App() {
               transition: 'all 0.2s',
             }}
           >
-            {isProcessing ? 'Verifying...' : 'Verify Content'}
+            {isProcessing ? 'Verifying...' : `Verify ${activeTab === 'TEXT' ? 'Text' : activeTab === 'URL' ? 'URL' : activeTab}`}
           </button>
         </div>
       </main>
@@ -471,13 +514,39 @@ export function App() {
             </div>
           </div>
 
-          {/* Grid Layout: Claims & Evidence + Forensics */}
-          <div style={{ display: 'grid', gridTemplateColumns: imageForensics || videoForensics ? '2fr 1fr' : '1fr', gap: '24px' }}>
+          {/* Extracted Modality Findings Strip */}
+          {(ocrText || transcriptText) && (
+            <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px', background: 'rgba(255, 255, 255, 0.02)' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
+                Extracted Textual Corpus (Grounding Claims)
+              </h4>
+              {ocrText && (
+                <div style={{ marginBottom: transcriptText ? '12px' : '0' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>OCR Text Detected in Media: </span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>"{ocrText}"</span>
+                </div>
+              )}
+              {transcriptText && (
+                <div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>ASR Speech Transcript: </span>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>"{transcriptText}"</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Grid Layout: Claims & Evidence (Left) + Forensics (Right) */}
+          <div style={{ display: 'grid', gridTemplateColumns: imageForensics || videoForensics ? '2fr 1.1fr' : '1fr', gap: '24px' }}>
             {/* Left Column: Claims & Evidence */}
             <div className="glass-panel" style={{ padding: '24px' }}>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🔍</span> Atomic Claim Veracity Breakdown
-              </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🔍</span> Factual Evidence Verification
+                </h3>
+                <span style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                  Ground Truth Indices
+                </span>
+              </div>
 
               {verifiedClaims.length > 0 ? (
                 <div>
@@ -511,7 +580,7 @@ export function App() {
                         <div style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-main)', marginTop: '4px' }}>
                           "{currentClaim.claim.canonical_claim}"
                         </div>
-                        <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                           <span>Check-worthiness: {(currentClaim.claim.checkworthy_score * 100).toFixed(0)}%</span>
                           <span>•</span>
                           <span>Sufficiency Index: {currentClaim.evidence_sufficiency_score.toFixed(2)}</span>
@@ -584,46 +653,87 @@ export function App() {
                   )}
                 </div>
               ) : (
-                <div style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>
-                  No structured propositions extracted from this input.
+                <div style={{ color: 'var(--text-dim)', fontSize: '0.9rem', padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                  No check-worthy propositional claims were extracted from this media input. The verdict reflects empirical insufficiency.
                 </div>
               )}
             </div>
 
-            {/* Right Column: Media Forensics (if image or video) */}
+            {/* Right Column: Media Forensics */}
             {(imageForensics || videoForensics) && (
               <div className="glass-panel" style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>🛡️</span> Media Forensics
-                </h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🛡️</span> Media Forensic Signals
+                  </h3>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: '16px' }}>
+                  * Probabilistic heuristics only — not binary or definitive proof of tampering.
+                </div>
 
                 {imageForensics && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '8px' }}>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Probabilistic AI-Generation</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Probabilistic AI-Generation Indicator</div>
                       <div style={{ fontSize: '1.6rem', fontWeight: 800, color: imageForensics.synthetic_probability > 0.6 ? '#f59e0b' : '#10b981', fontFamily: 'var(--font-mono)' }}>
                         {(imageForensics.synthetic_probability * 100).toFixed(0)}%
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Confidence: {imageForensics.synthetic_confidence}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Calibrated Confidence: {imageForensics.synthetic_confidence}</div>
                     </div>
 
                     <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '8px' }}>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Error Level Analysis (ELA)</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '2px', color: imageForensics.is_ela_spliced ? '#ef4444' : '#10b981' }}>
-                        {imageForensics.is_ela_spliced ? 'Splicing Detected' : 'Uniform Compression'}
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, marginTop: '2px', color: imageForensics.is_ela_spliced ? '#ef4444' : '#10b981' }}>
+                        {imageForensics.is_ela_spliced ? 'Localized Compression Splicing' : 'Uniform Compression'}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Max Error: {imageForensics.ela_max_error}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Max Error Level: {imageForensics.ela_max_error}</div>
                     </div>
 
-                    <div>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '6px' }}>
-                        Forensic Observations:
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '8px' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Provenance & C2PA Credentials</div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)', marginTop: '2px' }}>
+                        {imageForensics.c2pa_present ? '✅ C2PA Manifest Present' : 'Standard Metadata (No C2PA Manifest)'}
                       </div>
-                      <ul style={{ paddingLeft: '16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                        {imageForensics.forensic_notes.map((n, idx) => (
-                          <li key={idx} style={{ marginBottom: '4px' }}>{n}</li>
-                        ))}
-                      </ul>
+                      {imageForensics.software_tag && (
+                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', marginTop: '2px' }}>
+                          Editor Tag: {imageForensics.software_tag}
+                        </div>
+                      )}
+                    </div>
+
+                    {imageForensics.forensic_notes.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                          Forensic Observations:
+                        </div>
+                        <ul style={{ paddingLeft: '16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                          {imageForensics.forensic_notes.map((n, idx) => (
+                            <li key={idx} style={{ marginBottom: '4px' }}>{n}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {videoForensics && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '8px' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Sampled Keyframe Synthetic Metric</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 800, color: (videoForensics.synthetic_face_probability || 0.15) > 0.6 ? '#f59e0b' : '#10b981', fontFamily: 'var(--font-mono)' }}>
+                        {(((videoForensics.synthetic_face_probability || 0.15)) * 100).toFixed(0)}%
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>* Heuristic frequency inspection across keyframes</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '14px', borderRadius: '8px' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Stream Diagnostics</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', marginTop: '4px' }}>
+                        Duration: {videoForensics.duration_seconds.toFixed(1)}s • Scenes Sampled: {videoForensics.extracted_scenes}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Audio Track: {videoForensics.has_audio_track ? 'Detected' : 'Silent / None'}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -636,3 +746,4 @@ export function App() {
   );
 }
 export default App;
+

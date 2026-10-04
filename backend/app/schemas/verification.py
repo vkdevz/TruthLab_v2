@@ -54,6 +54,9 @@ class FullVerificationResponse(BaseModel):
     claims_verified: list[ClaimVerificationResult] = Field(default_factory=list)
     image_forensics: ImageForensicIndicators | None = None
     video_forensics: VideoForensicIndicators | None = None
+    ocr_text: str | None = None
+    transcript_text: str | None = None
     evidence_graph: EvidenceGraph
     executive_summary: str
     system_limitations: list[str] = Field(default_factory=list)
+

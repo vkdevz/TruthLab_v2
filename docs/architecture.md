@@ -55,3 +55,29 @@ backend/
 ### F. Persistence Layer
 - Async SQLite database (`verification.sqlite3`) managed via SQLAlchemy `AsyncSession`.
 - Persists full `VerificationJobRecord` entries, atomic claims, and cached evidence.
+
+### G. Media Ingestion & Security Gateway
+- MIME and magic byte signature verification (`storage.py`) for JPEG, PNG, WebP, MP4, WebM, and MOV containers.
+- Sanitized filenames, UUIDv4 storage keys, and streaming size limits (15MB image, 100MB video).
+- Safe temporary file lifecycle and guaranteed cleanup.
+
+### H. Image Intelligence Subsystem
+- **Metadata & Provenance**: EXIF, dimensions, color space, camera software, and C2PA provenance indicators.
+- **Error Level Analysis (ELA)**: Recompression differential analysis emitting structured `manipulation_signal`.
+- **Synthetic Detector Interface**: `SyntheticMediaDetector` probabilistic frequency analyzer emitting model version, preprocessing, and uncertainty.
+- **OCR Engine**: Bounded text digitization and regex-based artifact normalizer feeding the claim pipeline.
+
+### I. Video Intelligence Subsystem
+- **Technical Probe**: FFmpeg container analysis (duration <= 300s, resolution, fps, audio presence).
+- **Speech ASR**: Modular `VideoTranscriber` (Whisper base.en integration) preserving timestamped dialogue segments.
+- **Keyframe Extraction & Scene OCR**: Bounded keyframe sampling extracting onscreen chyrons, tickers, and visual forensics.
+
+### J. Temporal & Context Verifier
+- Explicit decoupling of event occurrence dates from source publication dates.
+- Heuristic recency/breaking marker analysis for out-of-context recycling detection (`OUTDATED`).
+- Geographic entity consistency matching returning `UNKNOWN` where context cannot be determined.
+
+### K. Multimodal Late-Fusion Engine
+- Transparent late fusion combining evidence sufficiency, stance support/refute, temporal penalties, media manipulation scores, and cross-modal alignment.
+- Strict precedence: Evidentiary refutation dominance ensures authoritative external evidence dominates weak media indicators.
+- Cross-modal disparity checker detects "cheapfakes" (real visual media with contradicting captions).

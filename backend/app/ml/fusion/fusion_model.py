@@ -18,7 +18,10 @@ class MultimodalFusionModel:
         image_forensics: ImageForensicIndicators | None = None,
         video_forensics: VideoForensicIndicators | None = None,
         ocr_text: str | None = None,
+        temporal_result: TemporalVerificationResult | None = None,
     ) -> FusionDecision:
+        t_res = temporal_res or temporal_result
+
         # 1. Compute Stance aggregations
         total_support = 0.0
         total_refute = 0.0
@@ -41,10 +44,10 @@ class MultimodalFusionModel:
 
         # 2. Temporal penalty
         temporal_penalty = 0.0
-        if temporal_res:
-            if temporal_res.is_outdated:
+        if t_res:
+            if t_res.is_outdated or t_res.temporal_status == "OUTDATED":
                 temporal_penalty = 0.95
-            elif temporal_res.is_anachronistic:
+            elif t_res.is_anachronistic:
                 temporal_penalty = 0.70
 
         # 3. Media manipulation score

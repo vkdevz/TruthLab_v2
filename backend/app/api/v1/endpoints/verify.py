@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from pydantic import BaseModel, Field
 from typing import Any
 from backend.app.schemas.verification import FullVerificationResponse, ClaimVerificationResult
@@ -45,6 +45,23 @@ async def verify_url_endpoint(payload: VerifyUrlRequest):
     URL -> SSRF Validation -> Safe Ingestion -> Article Extraction -> Claim Decomposition -> Evidence -> Verdict
     """
     return await pipeline_service.verify_url(payload.url)
+
+
+@router.post("/verify/image", response_model=FullVerificationResponse, summary="Verify image / screenshot / meme end-to-end")
+async def verify_image_endpoint(file: UploadFile = File(...)):
+    """End-to-end image verification pipeline:
+    Image -> Validation -> OCR & Forensics -> Claim Extraction -> Evidence Retrieval -> Verdict -> Graph
+    """
+    return await pipeline_service.verify_image(file)
+
+
+@router.post("/verify/video", response_model=FullVerificationResponse, summary="Verify video clip end-to-end")
+async def verify_video_endpoint(file: UploadFile = File(...)):
+    """End-to-end video verification pipeline:
+    Video -> Validation -> Probe & Keyframe OCR & ASR -> Claim Extraction -> Evidence -> Verdict -> Graph
+    """
+    return await pipeline_service.verify_video(file)
+
 
 
 @router.get("/verification/{job_id}", summary="Retrieve verification record by ID")

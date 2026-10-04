@@ -115,7 +115,98 @@ Accepts a target web page or news article URL, validates against private/loopbac
 
 ---
 
-## 4. Verification Job Retrieval
+## 4. Image Verification
+
+### `POST /verify/image`
+Uploads an image file (`image/jpeg`, `image/png`, `image/webp`), performs metadata extraction, ELA manipulation analysis, probabilistic synthetic detection, OCR text extraction, and routes extracted claims through external evidence retrieval and late multimodal fusion.
+
+- **Content-Type**: `multipart/form-data`
+- **Form Param**: `file` (binary image file)
+- **Limits**: Max 15 MB, validated magic byte signature.
+
+**Response (200 OK):**
+```json
+{
+  "job_id": "967520e5-7977-4b72-b7e6-231362ad14ef",
+  "created_at": "2026-10-04T07:11:00.000000Z",
+  "completed_at": "2026-10-04T07:11:00.120000Z",
+  "input_modality": "IMAGE",
+  "overall_veracity": "SUPPORTED",
+  "overall_confidence": 0.88,
+  "claims_verified": [ ... ],
+  "image_forensics": {
+    "dimensions": [1280, 720],
+    "format": "JPEG",
+    "color_mode": "RGB",
+    "has_exif": true,
+    "c2pa_present": false,
+    "ela_max_error": 0.12,
+    "is_ela_spliced": false,
+    "synthetic_probability": 0.10,
+    "synthetic_confidence": "LOW",
+    "manipulation_signal": {
+      "score": 0.10,
+      "interpretation": "Consistent compression profile across blocks",
+      "limitations": "Heuristic indicator only..."
+    },
+    "synthetic_signal": {
+      "model_name": "HeuristicFrequencySyntheticDetector",
+      "model_version": "1.2.0",
+      "synthetic_probability": 0.10,
+      "confidence": "LOW",
+      "limitations": "Probabilistic heuristic signal..."
+    }
+  },
+  "ocr_text": "NASA Perseverance rover confirmed ancient lake sediments on Mars",
+  "evidence_graph": { ... },
+  "executive_summary": "...",
+  "system_limitations": [ ... ]
+}
+```
+
+---
+
+## 5. Video Verification
+
+### `POST /verify/video`
+Uploads a video file (`video/mp4`, `video/webm`, `video/quicktime`), extracts technical container metadata via FFmpeg probe, extracts speech audio for Whisper ASR transcription, samples timestamped keyframes, executes overlay chyron OCR, builds a unified corpus, and executes temporal and late-multimodal verification.
+
+- **Content-Type**: `multipart/form-data`
+- **Form Param**: `file` (binary video file)
+- **Limits**: Max 100 MB, max duration 300s, validated container magic bytes.
+
+**Response (200 OK):**
+```json
+{
+  "job_id": "40209cb1-3da6-4654-be74-d4be4899533f",
+  "created_at": "2026-10-04T07:12:00.000000Z",
+  "completed_at": "2026-10-04T07:12:00.450000Z",
+  "input_modality": "VIDEO",
+  "overall_veracity": "MISLEADING",
+  "overall_confidence": 0.82,
+  "claims_verified": [ ... ],
+  "video_forensics": {
+    "duration_seconds": 18.5,
+    "dimensions": [1920, 1080],
+    "fps": 30.0,
+    "codec": "h264",
+    "has_audio": true,
+    "keyframes_extracted": 4,
+    "scene_count": 2,
+    "synthetic_face_probability": 0.12,
+    "video_authenticity_notes": [ ... ]
+  },
+  "transcript_text": "Breaking news report regarding downtown parade...",
+  "ocr_text": "ANNUAL CARNIVAL 2019",
+  "evidence_graph": { ... },
+  "executive_summary": "...",
+  "system_limitations": [ ... ]
+}
+```
+
+---
+
+## 6. Verification Job Retrieval
 
 ### `GET /verification/{job_id}`
 Retrieves the persistent verification record, execution stage, progress percentage, and full result payload by ID.
@@ -124,7 +215,7 @@ Retrieves the persistent verification record, execution stage, progress percenta
 ```json
 {
   "job_id": "2ddf0519-cdc0-469c-b539-6c334d474ab5",
-  "input_modality": "TEXT",
+  "input_modality": "IMAGE",
   "status": "COMPLETED",
   "progress_percent": 100,
   "current_stage": "FINISHED",

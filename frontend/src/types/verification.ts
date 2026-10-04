@@ -104,7 +104,10 @@ export interface FullVerificationResponse {
   claims_verified: ClaimVerificationResult[];
   image_forensics?: ImageForensicIndicators | null;
   video_forensics?: VideoForensicIndicators | null;
+  ocr_text?: string | null;
+  transcript_text?: string | null;
   evidence_graph: EvidenceGraph;
   executive_summary: string;
   system_limitations: string[];
 }
+
