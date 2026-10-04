@@ -1,0 +1,41 @@
+{
+  "model_type": "TF-IDF (1-2 gram) + Logistic Regression (C=1.0)",
+  "in_domain_metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "macro_f1": 1.0,
+    "ece": 0.399,
+    "confusion_matrix": [
+      [
+        8,
+        0
+      ],
+      [
+        0,
+        8
+      ]
+    ],
+    "sample_count": 16
+  },
+  "out_of_domain_metrics": {
+    "accuracy": 0.7,
+    "precision": 0.75,
+    "recall": 0.6,
+    "f1": 0.6667,
+    "macro_f1": 0.697,
+    "ece": 0.1841,
+    "confusion_matrix": [
+      [
+        4,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "sample_count": 10
+  }
+}
