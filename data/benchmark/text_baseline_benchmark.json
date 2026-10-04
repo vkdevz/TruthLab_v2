@@ -1,0 +1,110 @@
+{
+  "train": [
+    {
+      "text": "The central bank held interest rates steady today following its monthly monetary policy meeting.",
+      "label": 0
+    },
+    {
+      "text": "Scientists at the meteorological department forecast moderate rainfall across the coastal regions this weekend.",
+      "label": 0
+    },
+    {
+      "text": "The international trade summit concluded with bilateral agreements on semiconductor supply chains.",
+      "label": 0
+    },
+    {
+      "text": "Researchers published peer-reviewed findings on solar cell efficiency in the journal Nature Energy.",
+      "label": 0
+    },
+    {
+      "text": "The municipal corporation announced road repairs scheduled on the ring road starting next Monday.",
+      "label": 0
+    },
+    {
+      "text": "The national railway service launched electric locomotive trials on the northern freight corridor.",
+      "label": 0
+    },
+    {
+      "text": "The health ministry advised routine seasonal flu immunizations ahead of the winter season.",
+      "label": 0
+    },
+    {
+      "text": "Quarterly GDP growth figures were published by the national statistics office showing steady expansion.",
+      "label": 0
+    },
+    {
+      "text": "SHOCKING: Secret underground alien base uncovered beneath the presidential palace!",
+      "label": 1
+    },
+    {
+      "text": "URGENT ALERT: Drinking boiled garlic water cures all known viral diseases overnight!",
+      "label": 1
+    },
+    {
+      "text": "Government secretly putting microscopic tracking chips inside routine drinking water supplies!",
+      "label": 1
+    },
+    {
+      "text": "Billionaire reveals secret miracle investment that guarantees 500 percent returns in 24 hours!",
+      "label": 1
+    },
+    {
+      "text": "NASA whistleblower admits moon landing was staged on a Hollywood film studio soundstage!",
+      "label": 1
+    },
+    {
+      "text": "Doctors stunned as 100-year-old fruit eliminates cancer cells in just twenty minutes!",
+      "label": 1
+    },
+    {
+      "text": "Mysterious time traveler from year 3000 warns world leaders about imminent dinosaur invasion!",
+      "label": 1
+    },
+    {
+      "text": "Breaking: Major tech company announces plans to replace all human breathing with wireless oxygen!",
+      "label": 1
+    }
+  ],
+  "test": [
+    {
+      "text": "The aerospace agency confirmed the launch of a lunar reconnaissance satellite next month.",
+      "label": 0
+    },
+    {
+      "text": "Agricultural scientists reported that soil conservation techniques improved crop yield by twelve percent.",
+      "label": 0
+    },
+    {
+      "text": "New study links Mediterranean diet with reduced risk of cardiovascular illness in adults.",
+      "label": 0
+    },
+    {
+      "text": "Local transport authorities updated bus schedules for the downtown business district.",
+      "label": 0
+    },
+    {
+      "text": "Doctors recommend avoiding raw dairy products due to potential bacterial contamination risks.",
+      "label": 0
+    },
+    {
+      "text": "Secret military aircraft photographed creating artificial clouds to control global weather patterns.",
+      "label": 1
+    },
+    {
+      "text": "Celebrity politician arrested in top-secret tribunal and replaced with synthetic clone.",
+      "label": 1
+    },
+    {
+      "text": "Ancient scroll found in cave predicts massive asteroid impact scheduled for this Friday.",
+      "label": 1
+    },
+    {
+      "text": "Miracle magnetic bracelet permanently cures chronic diabetes and arthritis without medicine.",
+      "label": 1
+    },
+    {
+      "text": "Leaked documents reveal world governments plan to outlaw physical currency starting tomorrow.",
+      "label": 1
+    }
+  ]
+}

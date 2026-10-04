@@ -15,16 +15,16 @@ interface BenchmarkSample {
 
 const BENCHMARK_PRESETS: BenchmarkSample[] = [
   {
+    title: "India 5G Ban Hoax",
+    modality: "TEXT",
+    payload: "The Indian Ministry of Communications has officially banned all 5G network services nationwide.",
+    expected: "CONTRADICTED"
+  },
+  {
     title: "James Webb Discovery",
     modality: "TEXT",
     payload: "NASA's James Webb Space Telescope confirmed detection of atmospheric carbon dioxide on exoplanet WASP-39b.",
     expected: "SUPPORTED"
-  },
-  {
-    title: "Extraterrestrial Signal Hoax",
-    modality: "TEXT",
-    payload: "Breaking news: NASA scientists officially confirmed alien signals received today!",
-    expected: "CONTRADICTED"
   },
   {
     title: "2020 Recycled Curfew",
@@ -37,12 +37,19 @@ const BENCHMARK_PRESETS: BenchmarkSample[] = [
     modality: "TEXT",
     payload: "My local neighbor's cousin invented an invisible flying bicycle last night in his garage.",
     expected: "INSUFFICIENT_EVIDENCE"
+  },
+  {
+    title: "Article URL (Anti-SSRF)",
+    modality: "URL",
+    payload: "https://en.wikipedia.org/wiki/James_Webb_Space_Telescope",
+    expected: "SUPPORTED"
   }
 ];
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'TEXT' | 'URL' | 'IMAGE' | 'VIDEO'>('TEXT');
   const [inputText, setInputText] = useState('');
+  const [inputUrl, setInputUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progressStage, setProgressStage] = useState('');
@@ -60,7 +67,11 @@ export function App() {
 
   const handlePresetSelect = (preset: BenchmarkSample) => {
     setActiveTab(preset.modality);
-    setInputText(preset.payload);
+    if (preset.modality === 'URL') {
+      setInputUrl(preset.payload);
+    } else {
+      setInputText(preset.payload);
+    }
     setSelectedFile(null);
     setErrorMsg(null);
   };
@@ -76,11 +87,8 @@ export function App() {
           throw new Error('Please enter text to verify.');
         }
 
-        setProgressStage('Extracting & decomposing claims...');
-        await new Promise((r) => setTimeout(r, 400));
-
-        setProgressStage('Retrieving evidence & checking temporal anchors...');
-        const res = await fetch('http://localhost:8000/api/v1/verify/claim', {
+        setProgressStage('Decomposing claims & querying evidence indices...');
+        const res = await fetch('http://localhost:8000/api/v1/verify/text', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: inputText.trim() }),
@@ -92,16 +100,36 @@ export function App() {
         }
 
         const data = await res.json();
-        const claims: ClaimVerificationResult[] = data.results || [];
-        setVerifiedClaims(claims);
-
-        if (claims.length > 0) {
-          const first = claims[0];
-          setOverallVerdict(first.veracity);
-          setOverallConfidence(first.confidence);
-          setExecutiveSummary(first.audit.summary);
-          setLimitations(first.audit.limitations || []);
+        setVerifiedClaims(data.claims_verified || []);
+        setOverallVerdict(data.overall_veracity);
+        setOverallConfidence(data.overall_confidence);
+        setExecutiveSummary(data.executive_summary);
+        setLimitations(data.system_limitations || []);
+        setImageForensics(null);
+        setVideoForensics(null);
+      } else if (activeTab === 'URL') {
+        if (!inputUrl.trim()) {
+          throw new Error('Please enter a valid HTTP/HTTPS article URL to verify.');
         }
+
+        setProgressStage('Validating Anti-SSRF constraints & fetching article content...');
+        const res = await fetch('http://localhost:8000/api/v1/verify/url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: inputUrl.trim() }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'URL verification failed.');
+        }
+
+        const data = await res.json();
+        setVerifiedClaims(data.claims_verified || []);
+        setOverallVerdict(data.overall_veracity);
+        setOverallConfidence(data.overall_confidence);
+        setExecutiveSummary(data.executive_summary);
+        setLimitations(data.system_limitations || []);
         setImageForensics(null);
         setVideoForensics(null);
       } else if (activeTab === 'IMAGE') {
@@ -266,7 +294,7 @@ export function App() {
       <main className="glass-panel" style={{ padding: '28px', marginBottom: '32px' }}>
         {/* Modality Tabs */}
         <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '16px', marginBottom: '20px' }}>
-          {(['TEXT', 'IMAGE', 'VIDEO'] as const).map((tab) => (
+          {(['TEXT', 'URL', 'IMAGE', 'VIDEO'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => {
@@ -285,7 +313,7 @@ export function App() {
                 transition: 'all 0.2s',
               }}
             >
-              {tab === 'TEXT' ? 'Plain Text / Claim' : tab === 'IMAGE' ? 'Image / Screenshot / Meme' : 'Video / Clip'}
+              {tab === 'TEXT' ? 'Plain Text / Claim' : tab === 'URL' ? 'Article URL (Anti-SSRF)' : tab === 'IMAGE' ? 'Image / Screenshot / Meme' : 'Video / Clip'}
             </button>
           ))}
         </div>
@@ -311,6 +339,29 @@ export function App() {
                 resize: 'vertical',
               }}
             />
+          </div>
+        ) : activeTab === 'URL' ? (
+          <div>
+            <input
+              type="url"
+              value={inputUrl}
+              onChange={(e) => setInputUrl(e.target.value)}
+              placeholder="https://news.example.com/article-to-verify"
+              style={{
+                width: '100%',
+                background: 'rgba(10, 13, 20, 0.8)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '10px',
+                color: 'var(--text-main)',
+                padding: '14px',
+                fontSize: '0.95rem',
+                fontFamily: 'var(--font-sans)',
+                outline: 'none',
+              }}
+            />
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>🛡️</span> Protected by Anti-SSRF (DNS resolution, private CIDR filtering, redirect cap, 5MB response limit).
+            </div>
           </div>
         ) : (
           <div style={{

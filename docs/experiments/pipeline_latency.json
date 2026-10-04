@@ -1,0 +1,9 @@
+{
+  "claim_extraction_ms": 0.25,
+  "evidence_retrieval_ms": 0.09,
+  "evidence_ranking_ms": 3.11,
+  "nli_interpretation_ms": 0.0,
+  "verdict_engine_ms": 0.17,
+  "e2e_text_verification_ms": 13.81,
+  "e2e_url_verification_ms": 8.31
+}
