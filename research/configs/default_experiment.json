@@ -1,0 +1,41 @@
+{
+  "experiment_id": "EXP-01-FRAMEWORK",
+  "name": "research_framework_smoke",
+  "description": "Reproducible baseline framework validation",
+  "random_seed": 42,
+  "dataset": {
+    "name": "curated_verification_benchmark",
+    "source_path": "data/benchmark/text_baseline_benchmark.json",
+    "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+    "modalities": [
+      "text",
+      "image",
+      "video"
+    ],
+    "train_ratio": 0.6,
+    "val_ratio": 0.2,
+    "test_ratio": 0.2,
+    "stratified": true,
+    "random_seed": 42
+  },
+  "model": {
+    "baseline_type": "tfidf_logistic_regression",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features": 5000,
+    "regularization_c": 1.0,
+    "class_weight": "balanced",
+    "calibrator": "temperature_scaling",
+    "temperature": 1.15,
+    "fusion_strategy": "calibrated_decision_matrix"
+  },
+  "output_dir": "research/results",
+  "artifacts_dir": "research/artifacts",
+  "save_predictions": true,
+  "extra_params": {
+    "track_git": true,
+    "track_hardware": true
+  }
+}
