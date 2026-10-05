@@ -109,5 +109,8 @@ export interface FullVerificationResponse {
   evidence_graph: EvidenceGraph;
   executive_summary: string;
   system_limitations: string[];
+  uncertainty_level?: 'LOW' | 'MODERATE' | 'HIGH';
+  uncertainty_score?: number;
+  is_actionable?: boolean;
 }
 

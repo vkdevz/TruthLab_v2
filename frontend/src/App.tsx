@@ -263,7 +263,7 @@ export function App() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '999px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '12px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-cyan)' }} className="pulsing-glow"></span>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-cyan)', letterSpacing: '0.05em' }}>PHASE 2 — MULTIMODAL & TEMPORAL INTELLIGENCE</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-cyan)', letterSpacing: '0.05em' }}>v1.0.0-final • PRODUCTION VERIFICATION WORKBENCH</span>
           </div>
           <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(135deg, #fff 40%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Multimodal Evidence-Aware Misinformation Verification System
