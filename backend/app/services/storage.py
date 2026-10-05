@@ -76,10 +76,16 @@ class StorageService:
         """Prevents path traversal and removes control or invalid characters."""
         if not filename:
             return "unnamed_media"
+        # Remove null bytes and control chars
+        filename = filename.replace("\x00", "")
         # Take basename only to prevent directory traversal
         base = Path(filename).name
+        # Scrub traversal tokens and directory separators
+        base = base.replace("/", "").replace("\\", "").replace("..", "")
         # Allow only alphanumeric, dashes, underscores, and dots
         clean = re.sub(r"[^a-zA-Z0-9_\-\.]", "_", base)
+        if not clean or clean.startswith("."):
+            clean = f"media_{clean}"
         return clean[:120]
 
     async def save_upload_file(self, upload_file: UploadFile, is_video: bool = False) -> Path:
