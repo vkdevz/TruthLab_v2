@@ -35,6 +35,7 @@ from backend.app.verification.nli import nli_interpreter
 from backend.app.verification.verdict_engine import verdict_engine
 from backend.app.services.job_manager import job_manager
 from backend.app.core.config import settings
+from backend.app.ml.explainability.uncertainty_layer import uncertainty_layer
 
 
 def utc_now() -> datetime:
@@ -400,6 +401,22 @@ class PipelineService:
             edges=graph_edges
         )
 
+        # Estimate overall uncertainty
+        avg_sufficiency = (
+            float(sum(r.evidence_sufficiency_score for r in verified_results) / len(verified_results))
+            if verified_results else 0.0
+        )
+        has_conflicts = any(
+            any(e.stance == StanceType.REFUTES for e in r.evidence_items) and
+            any(e.stance == StanceType.SUPPORTS for e in r.evidence_items)
+            for r in verified_results
+        )
+        uncert_calc = uncertainty_layer.estimate_uncertainty(
+            raw_confidence=overall_confidence,
+            evidence_sufficiency=avg_sufficiency,
+            has_conflicting_evidence=has_conflicts,
+        )
+
         completed_at = utc_now()
         full_response = FullVerificationResponse(
             job_id=job_id,
@@ -408,6 +425,9 @@ class PipelineService:
             input_modality=modality,
             overall_veracity=overall_veracity,
             overall_confidence=round(overall_confidence, 3),
+            uncertainty_level=uncert_calc.uncertainty_level,
+            uncertainty_score=uncert_calc.uncertainty_score,
+            is_actionable=uncert_calc.is_actionable,
             claims_verified=verified_results,
             image_forensics=image_forensics,
             video_forensics=video_forensics,

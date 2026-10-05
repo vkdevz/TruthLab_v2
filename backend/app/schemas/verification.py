@@ -51,6 +51,9 @@ class FullVerificationResponse(BaseModel):
     input_modality: ModalityType
     overall_veracity: VeracityLabel
     overall_confidence: float = Field(..., ge=0.0, le=1.0)
+    uncertainty_level: str = Field(default="LOW", description="Overall categorical uncertainty: LOW, MODERATE, HIGH")
+    uncertainty_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Composite uncertainty score")
+    is_actionable: bool = Field(default=True, description="Flag indicating if evidence sufficiency and confidence support actionable judgment")
     claims_verified: list[ClaimVerificationResult] = Field(default_factory=list)
     image_forensics: ImageForensicIndicators | None = None
     video_forensics: VideoForensicIndicators | None = None

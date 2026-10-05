@@ -9,6 +9,12 @@ class CalibratedUncertainty(BaseModel):
     calibrated_confidence: float = Field(..., ge=0.0, le=1.0)
     expected_calibration_error: float = Field(..., ge=0.0, le=1.0)
     uncertainty_level: str  # "LOW", "MODERATE", "HIGH"
+    uncertainty_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    epistemic_uncertainty: float = Field(default=0.0, ge=0.0, le=1.0)
+    aleatoric_uncertainty: float = Field(default=0.0, ge=0.0, le=1.0)
+    evidence_sufficiency: float = Field(default=1.0, ge=0.0)
+    entropy: float = Field(default=0.0, ge=0.0)
+    is_actionable: bool = Field(default=True)
 
 
 class VerificationAuditReport(BaseModel):
