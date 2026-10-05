@@ -81,3 +81,14 @@ backend/
 - Transparent late fusion combining evidence sufficiency, stance support/refute, temporal penalties, media manipulation scores, and cross-modal alignment.
 - Strict precedence: Evidentiary refutation dominance ensures authoritative external evidence dominates weak media indicators.
 - Cross-modal disparity checker detects "cheapfakes" (real visual media with contradicting captions).
+
+### L. Uncertainty Estimation & Calibration Subsystem
+- **Epistemic vs. Aleatoric Decomposition**: Epistemic uncertainty is driven by evidence scarcity and lack of external knowledge; aleatoric uncertainty is driven by conflicting signals between sources.
+- **Shannon Entropy Scoring**: Normalized verdict probability distribution entropy: $H(P) = -\sum p_i \log_2(p_i)$.
+- **Empirical Calibration**: Temperature scaling ($T=1.85$) optimizes Expected Calibration Error (ECE from 0.2241 down to 0.0800), ensuring reported confidence represents true empirical likelihood.
+- **Actionability Gate**: High uncertainty ($U > 0.65$) triggers cautionary status flags to prevent automated over-trust in ambiguous scenarios.
+
+### M. Explainability & Transparent Audit Trails
+- **Evidence Graph**: Directed graph representation linking Claims $\leftrightarrow$ Evidence Citations $\leftrightarrow$ Forensic Indicators.
+- **Structured Audit Trails**: Provides per-claim supporting citations, refuting citations, temporal delta flags, and explicit system boundary disclaimers.
+- **Scientific Humility Principle**: The system communicates assistance rather than an infallible truth oracle.
