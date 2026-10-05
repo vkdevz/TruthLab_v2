@@ -60,6 +60,10 @@ export function App() {
   // Result States
   const [overallVerdict, setOverallVerdict] = useState<VeracityLabel | null>(null);
   const [overallConfidence, setOverallConfidence] = useState<number>(0);
+  const [uncertaintyLevel, setUncertaintyLevel] = useState<'LOW' | 'MODERATE' | 'HIGH' | null>(null);
+  const [uncertaintyScore, setUncertaintyScore] = useState<number | null>(null);
+  const [isActionable, setIsActionable] = useState<boolean | null>(null);
+  const [evidenceFilter, setEvidenceFilter] = useState<'ALL' | 'SUPPORTS' | 'REFUTES' | 'NEUTRAL'>('ALL');
   const [verifiedClaims, setVerifiedClaims] = useState<ClaimVerificationResult[]>([]);
   const [imageForensics, setImageForensics] = useState<ImageForensicIndicators | null>(null);
   const [videoForensics, setVideoForensics] = useState<VideoForensicIndicators | null>(null);
@@ -91,6 +95,23 @@ export function App() {
     setErrorMsg(null);
   };
 
+  const applyVerificationResponse = (data: FullVerificationResponse) => {
+    setVerifiedClaims(data.claims_verified || []);
+    setOverallVerdict(data.overall_veracity);
+    setOverallConfidence(data.overall_confidence);
+    setUncertaintyLevel(data.uncertainty_level || 'LOW');
+    setUncertaintyScore(data.uncertainty_score ?? 0.15);
+    setIsActionable(data.is_actionable ?? true);
+    setExecutiveSummary(data.executive_summary);
+    setLimitations(data.system_limitations || []);
+    setImageForensics(data.image_forensics || null);
+    setVideoForensics(data.video_forensics || null);
+    setOcrText(data.ocr_text || null);
+    setTranscriptText(data.transcript_text || null);
+    setActiveClaimIdx(0);
+    setEvidenceFilter('ALL');
+  };
+
   const handleVerify = async () => {
     setErrorMsg(null);
     setIsProcessing(true);
@@ -115,15 +136,7 @@ export function App() {
         }
 
         const data: FullVerificationResponse = await res.json();
-        setVerifiedClaims(data.claims_verified || []);
-        setOverallVerdict(data.overall_veracity);
-        setOverallConfidence(data.overall_confidence);
-        setExecutiveSummary(data.executive_summary);
-        setLimitations(data.system_limitations || []);
-        setImageForensics(null);
-        setVideoForensics(null);
-        setOcrText(null);
-        setTranscriptText(null);
+        applyVerificationResponse(data);
       } else if (activeTab === 'URL') {
         if (!inputUrl.trim()) {
           throw new Error('Please enter a valid HTTP/HTTPS article URL to verify.');
@@ -142,15 +155,7 @@ export function App() {
         }
 
         const data: FullVerificationResponse = await res.json();
-        setVerifiedClaims(data.claims_verified || []);
-        setOverallVerdict(data.overall_veracity);
-        setOverallConfidence(data.overall_confidence);
-        setExecutiveSummary(data.executive_summary);
-        setLimitations(data.system_limitations || []);
-        setImageForensics(null);
-        setVideoForensics(null);
-        setOcrText(null);
-        setTranscriptText(null);
+        applyVerificationResponse(data);
       } else if (activeTab === 'IMAGE') {
         if (!selectedFile) {
           throw new Error('Please select an image file to upload.');
@@ -171,15 +176,7 @@ export function App() {
         }
 
         const data: FullVerificationResponse = await res.json();
-        setImageForensics(data.image_forensics || null);
-        setVideoForensics(null);
-        setVerifiedClaims(data.claims_verified || []);
-        setOverallVerdict(data.overall_veracity);
-        setOverallConfidence(data.overall_confidence);
-        setExecutiveSummary(data.executive_summary);
-        setLimitations(data.system_limitations || []);
-        setOcrText(data.ocr_text || null);
-        setTranscriptText(null);
+        applyVerificationResponse(data);
       } else if (activeTab === 'VIDEO') {
         if (!selectedFile) {
           throw new Error('Please select a video file to upload.');
@@ -200,15 +197,7 @@ export function App() {
         }
 
         const data: FullVerificationResponse = await res.json();
-        setVideoForensics(data.video_forensics || null);
-        setImageForensics(null);
-        setVerifiedClaims(data.claims_verified || []);
-        setOverallVerdict(data.overall_veracity);
-        setOverallConfidence(data.overall_confidence);
-        setExecutiveSummary(data.executive_summary);
-        setLimitations(data.system_limitations || []);
-        setOcrText(data.ocr_text || null);
-        setTranscriptText(data.transcript_text || null);
+        applyVerificationResponse(data);
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Verification pipeline encountered an error.');
@@ -473,6 +462,27 @@ export function App() {
       {/* Results View */}
       {overallVerdict && (
         <section style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+          {/* Scientific Epistemic Humility Banner */}
+          <div
+            style={{
+              background: 'rgba(56, 189, 248, 0.06)',
+              border: '1px solid rgba(56, 189, 248, 0.25)',
+              borderRadius: '10px',
+              padding: '12px 18px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              fontSize: '0.85rem',
+              color: 'var(--text-main)',
+            }}
+          >
+            <span style={{ fontSize: '1.25rem' }}>🛡️</span>
+            <div>
+              <strong style={{ color: 'var(--accent-cyan)' }}>Operational Notice:</strong> This system assists empirical verification by synthesizing observable evidentiary citations, temporal anchors, and media forensic signals; <em>it does not possess an infallible truth oracle</em>. Decisions should be corroborated before high-stakes distribution.
+            </div>
+          </div>
+
           {/* Verdict Banner */}
           <div
             className="glass-panel"
@@ -510,7 +520,64 @@ export function App() {
               <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>
                 {(overallConfidence * 100).toFixed(1)}%
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>ECE Bounded &lt; 0.08</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Temperature / Platt Scaled</div>
+            </div>
+
+            {/* Uncertainty and Calibration Telemetry */}
+            <div
+              style={{
+                width: '100%',
+                marginTop: '16px',
+                paddingTop: '16px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  Uncertainty Estimation
+                </div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                  <span
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      background: uncertaintyLevel === 'LOW' ? 'rgba(16, 185, 129, 0.18)' : uncertaintyLevel === 'HIGH' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(245, 158, 11, 0.18)',
+                      color: uncertaintyLevel === 'LOW' ? '#10b981' : uncertaintyLevel === 'HIGH' ? '#ef4444' : '#f59e0b',
+                      border: `1px solid ${uncertaintyLevel === 'LOW' ? 'rgba(16, 185, 129, 0.35)' : uncertaintyLevel === 'HIGH' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
+                    }}
+                  >
+                    {uncertaintyLevel || 'LOW'} UNCERTAINTY
+                  </span>
+                  {uncertaintyScore !== null && (
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                      (Score: {uncertaintyScore.toFixed(2)})
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  Actionability Assessment
+                </div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 600, marginTop: '4px', color: isActionable !== false ? '#10b981' : '#f59e0b' }}>
+                  {isActionable !== false ? '✅ Actionable Decision' : '⚠️ Elevated Ambiguity (Review Suggested)'}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  Reliability Model
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  Calibrated Platt / Temperature Scaling
+                </div>
+              </div>
             </div>
           </div>
 
@@ -593,13 +660,44 @@ export function App() {
                         </div>
                       </div>
 
-                      {/* Evidence Citations */}
-                      <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase' }}>
-                        Verified Citations & Stance Records ({currentClaim.evidence_items.length})
-                      </h4>
+                      {/* Evidence Citations Header & Stance Filters */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', margin: 0 }}>
+                          Verified Citations & Stance Records ({currentClaim.evidence_items.length})
+                        </h4>
+
+                        {/* Stance Filter Buttons */}
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {(['ALL', 'SUPPORTS', 'REFUTES', 'NEUTRAL'] as const).map((filter) => {
+                            const count = filter === 'ALL'
+                              ? currentClaim.evidence_items.length
+                              : currentClaim.evidence_items.filter(e => e.stance === filter).length;
+                            return (
+                              <button
+                                key={filter}
+                                onClick={() => setEvidenceFilter(filter)}
+                                style={{
+                                  background: evidenceFilter === filter ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                                  border: `1px solid ${evidenceFilter === filter ? 'var(--accent-cyan)' : 'var(--border-subtle)'}`,
+                                  color: evidenceFilter === filter ? 'var(--accent-cyan)' : 'var(--text-dim)',
+                                  padding: '4px 10px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {filter === 'ALL' ? 'All' : filter === 'SUPPORTS' ? 'Supports' : filter === 'REFUTES' ? 'Refutes' : 'Neutral'} ({count})
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {currentClaim.evidence_items.map((ev, eIdx) => {
+                        {currentClaim.evidence_items
+                          .filter(ev => evidenceFilter === 'ALL' || ev.stance === evidenceFilter)
+                          .map((ev, eIdx) => {
                           const isRefute = ev.stance === 'REFUTES';
                           const isSupp = ev.stance === 'SUPPORTS';
                           return (
@@ -635,6 +733,18 @@ export function App() {
                               <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
                                 "{ev.snippet_text}"
                               </p>
+
+                              {/* Probabilistic Stance Distribution Bar */}
+                              {ev.stance_probabilities && (
+                                <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                                  <span>NLI Marginals:</span>
+                                  <span style={{ color: '#10b981' }}>Supp: {(ev.stance_probabilities.SUPPORTS * 100).toFixed(0)}%</span>
+                                  <span>•</span>
+                                  <span style={{ color: '#ef4444' }}>Ref: {(ev.stance_probabilities.REFUTES * 100).toFixed(0)}%</span>
+                                  <span>•</span>
+                                  <span style={{ color: '#94a3b8' }}>Neut: {(ev.stance_probabilities.NEUTRAL * 100).toFixed(0)}%</span>
+                                </div>
+                              )}
                               <div style={{ marginTop: '8px' }}>
                                 <a
                                   href={ev.source_url}
