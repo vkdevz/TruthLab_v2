@@ -1,0 +1,375 @@
+{
+  "experiment_id": "EXP-07-ABLATION",
+  "name": "ablation_study_benchmark",
+  "description": "Systematic ablation study quantifying component contributions",
+  "config": {
+    "experiment_id": "EXP-07-ABLATION",
+    "name": "ablation_study_benchmark",
+    "description": "Systematic ablation study quantifying component contributions",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:31:26.447331+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "f0fe42b0f869c51855d1b293f1c9cfc9987a78f6",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.056,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Progressive ablation study from text-only baseline to full multimodal architecture",
+    "sample_count": 15,
+    "classes": [
+      "SUPPORTED",
+      "CONTRADICTED",
+      "MISLEADING",
+      "OUTDATED",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "ablation_configurations": {
+      "A_text_only": {
+        "name": "Configuration A (Text Only Baseline)",
+        "components": [
+          "TF-IDF",
+          "Logistic Regression"
+        ],
+        "five_class_accuracy": 0.5333,
+        "five_class_macro_f1": 0.5276,
+        "binary_accuracy": 0.8,
+        "binary_macro_f1": 0.7205,
+        "per_class_f1": {
+          "SUPPORTED": 0.5714,
+          "CONTRADICTED": 0.4,
+          "MISLEADING": 0.5,
+          "OUTDATED": 0.6667,
+          "INSUFFICIENT_EVIDENCE": 0.5
+        },
+        "confusion_matrix": [
+          [
+            2,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        ]
+      },
+      "B_text_evidence": {
+        "name": "Configuration B (Text + Evidence Retrieval & Stance NLI)",
+        "components": [
+          "Claim Decomposition",
+          "Evidence Retrieval",
+          "Stance Classifier",
+          "Fusion Matrix"
+        ],
+        "five_class_accuracy": 0.8,
+        "five_class_macro_f1": 0.7333,
+        "binary_accuracy": 1.0,
+        "binary_macro_f1": 1.0,
+        "per_class_f1": {
+          "SUPPORTED": 1.0,
+          "CONTRADICTED": 0.6667,
+          "MISLEADING": 1.0,
+          "OUTDATED": 0.0,
+          "INSUFFICIENT_EVIDENCE": 1.0
+        },
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            3
+          ]
+        ]
+      },
+      "C_text_evidence_temporal": {
+        "name": "Configuration C (Text + Evidence + Temporal)",
+        "components": [
+          "Claim Decomposition",
+          "Evidence Retrieval",
+          "Stance Classifier",
+          "Temporal Verifier",
+          "Fusion Matrix"
+        ],
+        "five_class_accuracy": 0.8,
+        "five_class_macro_f1": 0.7333,
+        "binary_accuracy": 1.0,
+        "binary_macro_f1": 1.0,
+        "per_class_f1": {
+          "SUPPORTED": 1.0,
+          "CONTRADICTED": 0.6667,
+          "MISLEADING": 1.0,
+          "OUTDATED": 0.0,
+          "INSUFFICIENT_EVIDENCE": 1.0
+        },
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            3
+          ]
+        ]
+      },
+      "D_text_evidence_media": {
+        "name": "Configuration D (Text + Evidence + Media Signals)",
+        "components": [
+          "Claim Decomposition",
+          "Evidence Retrieval",
+          "Stance Classifier",
+          "Media Forensics",
+          "Fusion Matrix"
+        ],
+        "five_class_accuracy": 0.8,
+        "five_class_macro_f1": 0.7333,
+        "binary_accuracy": 1.0,
+        "binary_macro_f1": 1.0,
+        "per_class_f1": {
+          "SUPPORTED": 1.0,
+          "CONTRADICTED": 0.6667,
+          "MISLEADING": 1.0,
+          "OUTDATED": 0.0,
+          "INSUFFICIENT_EVIDENCE": 1.0
+        },
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            3
+          ]
+        ]
+      },
+      "E_full_multimodal": {
+        "name": "Configuration E (Full Multimodal System)",
+        "components": [
+          "Claim Decomposition",
+          "Evidence Retrieval",
+          "Stance Classifier",
+          "Temporal Verifier",
+          "Media Forensics",
+          "Fusion Matrix"
+        ],
+        "five_class_accuracy": 0.8,
+        "five_class_macro_f1": 0.7333,
+        "binary_accuracy": 1.0,
+        "binary_macro_f1": 1.0,
+        "per_class_f1": {
+          "SUPPORTED": 1.0,
+          "CONTRADICTED": 0.6667,
+          "MISLEADING": 1.0,
+          "OUTDATED": 0.0,
+          "INSUFFICIENT_EVIDENCE": 1.0
+        },
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            3
+          ]
+        ]
+      }
+    },
+    "marginal_contributions": {
+      "evidence_retrieval_gain": 0.2057,
+      "temporal_reasoning_gain": 0.0,
+      "media_signals_gain": 0.0,
+      "full_multimodal_synergy_gain": 0.2057
+    }
+  }
+}
