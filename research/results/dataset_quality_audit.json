@@ -1,0 +1,29 @@
+{
+  "total_records": 60,
+  "train_records": 35,
+  "val_records": 10,
+  "test_records": 15,
+  "exact_duplicates": [],
+  "near_duplicates": [],
+  "train_test_leakages": [],
+  "missing_value_errors": [],
+  "malformed_records": [],
+  "inconsistent_labels": [],
+  "class_distribution": {
+    "CONTRADICTED": 12,
+    "INSUFFICIENT_EVIDENCE": 12,
+    "MISLEADING": 12,
+    "OUTDATED": 12,
+    "SUPPORTED": 12
+  },
+  "class_imbalance_entropy": 2.3219,
+  "modality_distribution": {
+    "text": 41,
+    "text+video": 9,
+    "text+image": 10
+  },
+  "multimodal_mismatches": [],
+  "url_duplicates": {},
+  "warnings": [],
+  "audit_passed": true
+}
