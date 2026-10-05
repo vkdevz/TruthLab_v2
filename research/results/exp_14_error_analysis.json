@@ -1,0 +1,132 @@
+{
+  "experiment_id": "EXP-14-ERROR-ANALYSIS",
+  "name": "systematic_error_analysis",
+  "description": "Empirical failure analysis and taxonomy classification",
+  "config": {
+    "experiment_id": "EXP-14-ERROR-ANALYSIS",
+    "name": "systematic_error_analysis",
+    "description": "Empirical failure analysis and taxonomy classification",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:39:48.235687+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "979a8b2faba6202b624fb66219acbe9ea7cfdc0e",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.0008,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Systematic failure categorization on benchmark evaluation runs",
+    "total_test_samples": 15,
+    "total_misclassifications": 4,
+    "category_counts": {
+      "RETRIEVAL_FAILURE": 1,
+      "TEMPORAL_FAILURE": 3
+    },
+    "category_percentages": {
+      "RETRIEVAL_FAILURE": 25.0,
+      "TEMPORAL_FAILURE": 75.0
+    },
+    "failure_cases": [
+      {
+        "sample_id": "claim_ins_012",
+        "claim_text": "Unverified rumor claims an unnamed space agency detected a metallic obelisk floating near Jupiter's moon Callisto.",
+        "modality": "text",
+        "gold_verdict": "INSUFFICIENT_EVIDENCE",
+        "predicted_verdict": "SUPPORTED",
+        "confidence": 0.94,
+        "uncertainty_level": "LOW",
+        "primary_failure_category": "RETRIEVAL_FAILURE",
+        "root_cause_explanation": "Retrieved 1 tangential snippets that falsely inflated evidence sufficiency.",
+        "remediation_strategy": "Increase strictness of semantic relevance thresholding before admitting snippets to fusion."
+      },
+      {
+        "sample_id": "claim_out_004",
+        "claim_text": "Recycled video shows airport flooding disaster happening today in Florida during hurricane season.",
+        "modality": "text+video",
+        "gold_verdict": "OUTDATED",
+        "predicted_verdict": "CONTRADICTED",
+        "confidence": 0.934,
+        "uncertainty_level": "LOW",
+        "primary_failure_category": "TEMPORAL_FAILURE",
+        "root_cause_explanation": "Temporal verifier assigned status 'OUTDATED' rather than recognizing historical event recycling.",
+        "remediation_strategy": "Enhance temporal anchor extraction for relative temporal phrases and expand historical event knowledge graphs."
+      },
+      {
+        "sample_id": "claim_out_007",
+        "claim_text": "Notice: World Health Organization officially warns against taking ibuprofen for COVID-19 symptoms.",
+        "modality": "text",
+        "gold_verdict": "OUTDATED",
+        "predicted_verdict": "CONTRADICTED",
+        "confidence": 0.934,
+        "uncertainty_level": "LOW",
+        "primary_failure_category": "TEMPORAL_FAILURE",
+        "root_cause_explanation": "Temporal verifier assigned status 'HISTORICAL' rather than recognizing historical event recycling.",
+        "remediation_strategy": "Enhance temporal anchor extraction for relative temporal phrases and expand historical event knowledge graphs."
+      },
+      {
+        "sample_id": "claim_out_003",
+        "claim_text": "Urgent alert: Postal service issues warning about anthrax spores found in office mailboxes today!",
+        "modality": "text",
+        "gold_verdict": "OUTDATED",
+        "predicted_verdict": "CONTRADICTED",
+        "confidence": 0.934,
+        "uncertainty_level": "LOW",
+        "primary_failure_category": "TEMPORAL_FAILURE",
+        "root_cause_explanation": "Temporal verifier assigned status 'OUTDATED' rather than recognizing historical event recycling.",
+        "remediation_strategy": "Enhance temporal anchor extraction for relative temporal phrases and expand historical event knowledge graphs."
+      }
+    ]
+  }
+}
