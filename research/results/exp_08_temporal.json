@@ -1,0 +1,158 @@
+{
+  "experiment_id": "EXP-08-TEMPORAL",
+  "name": "temporal_verification_benchmark",
+  "description": "Controlled evaluation of temporal reasoning and outdated claim detection",
+  "config": {
+    "experiment_id": "EXP-08-TEMPORAL",
+    "name": "temporal_verification_benchmark",
+    "description": "Controlled evaluation of temporal reasoning and outdated claim detection",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:32:21.337377+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "095a3088c05c450b532c595d81bedc3e71d67727",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.8719,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Temporal verification and event vs publication date disambiguation benchmark",
+    "sample_count": 10,
+    "explicit_assumptions": [
+      "Publication date of a news article or fact-check is strictly distinct from the underlying event occurrence date.",
+      "Absence of explicit temporal anchors in a scientific claim is marked UNKNOWN and does not trigger temporal penalties.",
+      "Present-framing markers ('today', 'breaking') paired with corroborated historical events trigger OUTDATED classification."
+    ],
+    "metrics": {
+      "present_framing_detection_accuracy": 1.0,
+      "outdated_claim_precision": 0.6667,
+      "outdated_claim_recall": 1.0,
+      "outdated_claim_f1": 0.8,
+      "temporal_status_overall_accuracy": 0.8,
+      "event_vs_publication_separation_rate": 1.0
+    },
+    "breakdown": [
+      {
+        "id": "temp_case_001",
+        "gold_status": "OUTDATED",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_002",
+        "gold_status": "OUTDATED",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_003",
+        "gold_status": "OUTDATED",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_004",
+        "gold_status": "OUTDATED",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_005",
+        "gold_status": "CURRENT",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_006",
+        "gold_status": "CURRENT",
+        "pred_status": "OUTDATED",
+        "gold_present_framing": true,
+        "pred_present_framing": true
+      },
+      {
+        "id": "temp_case_007",
+        "gold_status": "HISTORICAL",
+        "pred_status": "HISTORICAL",
+        "gold_present_framing": false,
+        "pred_present_framing": false
+      },
+      {
+        "id": "temp_case_008",
+        "gold_status": "HISTORICAL",
+        "pred_status": "HISTORICAL",
+        "gold_present_framing": false,
+        "pred_present_framing": false
+      },
+      {
+        "id": "temp_case_009",
+        "gold_status": "UNKNOWN",
+        "pred_status": "UNKNOWN",
+        "gold_present_framing": false,
+        "pred_present_framing": false
+      },
+      {
+        "id": "temp_case_010",
+        "gold_status": "UNKNOWN",
+        "pred_status": "UNKNOWN",
+        "gold_present_framing": false,
+        "pred_present_framing": false
+      }
+    ]
+  }
+}
