@@ -1,14 +1,335 @@
 {
-  "sample_count": 8,
-  "baseline_text_only": {
-    "binary_accuracy": 0.75,
-    "macro_f1": 0.75
+  "experiment_id": "EXP-05-EVIDENCE-AWARE",
+  "name": "evidence_aware_benchmark",
+  "description": "Controlled comparative evaluation of text-only vs evidence-aware verification",
+  "config": {
+    "experiment_id": "EXP-05-EVIDENCE-AWARE",
+    "name": "evidence_aware_benchmark",
+    "description": "Controlled comparative evaluation of text-only vs evidence-aware verification",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
   },
-  "proposed_evidence_system": {
-    "binary_accuracy": 0.875,
-    "binary_macro_f1": 0.8545,
-    "five_class_accuracy": 0.625,
-    "five_class_macro_f1": 0.4917
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:29:46.624653+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "5e9550c87c60e8ff4e13570107a91707189be330",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
   },
-  "f1_improvement": 0.1045
+  "elapsed_seconds": 0.0619,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "sample_count": 15,
+    "comparison": {
+      "baseline_text_only": {
+        "binary_accuracy": 0.8667,
+        "binary_macro_f1": 0.7115,
+        "five_class_accuracy": 0.5333,
+        "five_class_macro_f1": 0.5276,
+        "insufficient_evidence_recall": 0.3333,
+        "confusion_matrix": [
+          [
+            2,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            2,
+            0
+          ],
+          [
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        ]
+      },
+      "proposed_evidence_system": {
+        "binary_accuracy": 0.9333,
+        "binary_macro_f1": 0.9068,
+        "five_class_accuracy": 0.7333,
+        "five_class_macro_f1": 0.6648,
+        "insufficient_evidence_recall": 0.6667,
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            2
+          ]
+        ]
+      },
+      "improvements": {
+        "binary_macro_f1_delta": 0.1953,
+        "five_class_macro_f1_delta": 0.1371,
+        "insufficient_recall_delta": 0.3333
+      }
+    },
+    "retrieval_grounding_ratio": 0.8667,
+    "sample_evaluations": [
+      {
+        "id": "claim_con_008",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Elevated synthetic image probability reduces cross-modal evidentiary reliability. Localized visual splicing detected via ELA, indicating image alteration. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_con_004",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Elevated synthetic image probability reduces cross-modal evidentiary reliability. Localized visual splicing detected via ELA, indicating image alteration. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_con_007",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_ins_003",
+        "predicted_5class": "INSUFFICIENT_EVIDENCE",
+        "predicted_binary": 1,
+        "confidence": 0.45,
+        "evidence_count": 0,
+        "supporting_count": 0,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Evidence retrieval density below minimum statistical sufficiency threshold."
+      },
+      {
+        "id": "claim_ins_012",
+        "predicted_5class": "SUPPORTED",
+        "predicted_binary": 0,
+        "confidence": 0.94,
+        "evidence_count": 1,
+        "supporting_count": 1,
+        "refuting_count": 0,
+        "temporal_status": "HISTORICAL",
+        "explanation": "Event date estimated from fact-check investigation date. Authoritative evidence corroborates the claim; media context is congruent."
+      },
+      {
+        "id": "claim_ins_008",
+        "predicted_5class": "INSUFFICIENT_EVIDENCE",
+        "predicted_binary": 1,
+        "confidence": 0.45,
+        "evidence_count": 0,
+        "supporting_count": 0,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Evidence retrieval density below minimum statistical sufficiency threshold."
+      },
+      {
+        "id": "claim_mis_006",
+        "predicted_5class": "MISLEADING",
+        "predicted_binary": 1,
+        "confidence": 0.7,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 0,
+        "temporal_status": "CURRENT",
+        "explanation": "Evidence is conflicting or non-conclusive across sources."
+      },
+      {
+        "id": "claim_mis_010",
+        "predicted_5class": "MISLEADING",
+        "predicted_binary": 1,
+        "confidence": 0.7,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Evidence is conflicting or non-conclusive across sources."
+      },
+      {
+        "id": "claim_mis_012",
+        "predicted_5class": "MISLEADING",
+        "predicted_binary": 1,
+        "confidence": 0.7,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Evidence is conflicting or non-conclusive across sources."
+      },
+      {
+        "id": "claim_out_004",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "OUTDATED",
+        "explanation": "Historical date '2017' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 3564 days to 2017-01-01. Geographic entity confirmed in evidence: united states Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_out_007",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "HISTORICAL",
+        "explanation": "Historical date '2020' corroborated directly within evidence text. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_out_003",
+        "predicted_5class": "CONTRADICTED",
+        "predicted_binary": 1,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 0,
+        "refuting_count": 1,
+        "temporal_status": "OUTDATED",
+        "explanation": "Historical date '2001' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 9408 days to 2001-01-01. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+      },
+      {
+        "id": "claim_sup_002",
+        "predicted_5class": "SUPPORTED",
+        "predicted_binary": 0,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 1,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Geographic entity confirmed in evidence: india Authoritative evidence corroborates the claim; media context is congruent."
+      },
+      {
+        "id": "claim_sup_009",
+        "predicted_5class": "SUPPORTED",
+        "predicted_binary": 0,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 1,
+        "refuting_count": 0,
+        "temporal_status": "UNKNOWN",
+        "explanation": "Authoritative evidence corroborates the claim; media context is congruent."
+      },
+      {
+        "id": "claim_sup_004",
+        "predicted_5class": "SUPPORTED",
+        "predicted_binary": 0,
+        "confidence": 0.934,
+        "evidence_count": 1,
+        "supporting_count": 1,
+        "refuting_count": 0,
+        "temporal_status": "HISTORICAL",
+        "explanation": "Authoritative evidence corroborates the claim; media context is congruent."
+      }
+    ]
+  }
 }
