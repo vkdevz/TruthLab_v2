@@ -1,0 +1,96 @@
+{
+  "experiment_id": "EXP-10-FORENSICS",
+  "name": "media_forensics_benchmark",
+  "description": "Controlled evaluation of auxiliary media forensic signals",
+  "config": {
+    "experiment_id": "EXP-10-FORENSICS",
+    "name": "media_forensics_benchmark",
+    "description": "Controlled evaluation of auxiliary media forensic signals",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:34:28.993224+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "9f508bb87b631df9745929ab4997e86d20453553",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.0321,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Evaluation of auxiliary media forensic signals on controlled test images",
+    "scientific_integrity_status": {
+      "exif_metadata": "AUXILIARY SIGNAL (Metadata is routinely stripped or spoofed; presence != authenticity).",
+      "error_level_analysis": "AUXILIARY SIGNAL (Indicates compression rate variance; does not prove forgery).",
+      "synthetic_media_heuristic": "UNVALIDATED EXPLORATORY SIGNAL (Statistical pixel variance heuristic; NOT a validated AI-image detector)."
+    },
+    "results": {
+      "error_level_analysis": {
+        "pristine_max_error": 0.102,
+        "spliced_max_error": 0.204,
+        "spliced_detected": false,
+        "ela_variance_contrast_ratio": 2.0
+      },
+      "metadata_forensics": {
+        "tagged_software_detected": "Adobe Photoshop 2024",
+        "tagged_has_exif": true,
+        "stripped_has_exif": false,
+        "c2pa_credentials_found": false
+      },
+      "synthetic_heuristic": {
+        "pristine_score": 0.35,
+        "spliced_score": 0.35,
+        "validation_status": "EXPLICITLY_UNVALIDATED"
+      }
+    }
+  }
+}
