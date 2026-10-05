@@ -1,0 +1,5 @@
+Calibration Method,Expected Calibration Error (ECE),Max Calibration Error (MCE),Brier Score,ECE Reduction (Δ)
+Uncalibrated,0.1441,0.2484,0.0251,Baseline
+Temperature Scaling,0.0,0.0,0.0,-0.1441
+Platt Scaling,0.0946,0.4767,0.0269,-0.0495
+Isotonic Regression,0.0443,0.2649,0.0076,-0.0998

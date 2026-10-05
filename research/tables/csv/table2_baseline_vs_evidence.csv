@@ -1,0 +1,6 @@
+Evaluation Metric,Text Baseline (TF-IDF+LR),Proposed Evidence System,Relative Delta (Δ)
+Binary Accuracy,0.8667,0.9333,+0.1953
+Binary Macro-F1,0.7115,0.9068,+0.1953
+5-Class Accuracy,0.5333,0.7333,+0.2
+5-Class Macro-F1,0.5276,0.6648,+0.1371
+Insufficient Evidence Recall,0.3333,0.6667,+0.3333
