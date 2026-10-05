@@ -1,0 +1,312 @@
+{
+  "experiment_id": "EXP-11-CALIBRATION",
+  "name": "confidence_calibration_benchmark",
+  "description": "Comprehensive evaluation of ECE, Brier score, and calibration methods",
+  "config": {
+    "experiment_id": "EXP-11-CALIBRATION",
+    "name": "confidence_calibration_benchmark",
+    "description": "Comprehensive evaluation of ECE, Brier score, and calibration methods",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:35:27.930633+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "14d8e3b8fa887ff1526910c7c238b2e9fa3e8f70",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.0059,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Comparative evaluation of uncalibrated vs calibrated confidence estimation",
+    "dataset_split": {
+      "val_samples": 10,
+      "test_samples": 15
+    },
+    "optimal_temperature_factor": 0.1061,
+    "methods": {
+      "uncalibrated": {
+        "brier_score": 0.0251,
+        "expected_calibration_error_ece": 0.1441,
+        "maximum_calibration_error_mce": 0.2484,
+        "reliability_bins": [
+          {
+            "bin_range": [
+              0.0,
+              0.2
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.0305,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0305
+          },
+          {
+            "bin_range": [
+              0.2,
+              0.4
+            ],
+            "sample_count": 2,
+            "mean_confidence": 0.2465,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.2465
+          },
+          {
+            "bin_range": [
+              0.4,
+              0.6
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.5,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.6,
+              0.8
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.7516,
+            "empirical_accuracy": 1.0,
+            "calibration_error": 0.2484
+          },
+          {
+            "bin_range": [
+              0.8,
+              1.0
+            ],
+            "sample_count": 11,
+            "mean_confidence": 0.8737,
+            "empirical_accuracy": 1.0,
+            "calibration_error": 0.1263
+          }
+        ]
+      },
+      "temperature_scaling": {
+        "brier_score": 0.0,
+        "expected_calibration_error_ece": 0.0,
+        "maximum_calibration_error_mce": 0.0,
+        "reliability_bins": [
+          {
+            "bin_range": [
+              0.0,
+              0.2
+            ],
+            "sample_count": 3,
+            "mean_confidence": 0.0,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.2,
+              0.4
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.3,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.4,
+              0.6
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.5,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.6,
+              0.8
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.7,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.8,
+              1.0
+            ],
+            "sample_count": 12,
+            "mean_confidence": 1.0,
+            "empirical_accuracy": 1.0,
+            "calibration_error": 0.0
+          }
+        ]
+      },
+      "platt_scaling": {
+        "brier_score": 0.0269,
+        "expected_calibration_error_ece": 0.0946,
+        "maximum_calibration_error_mce": 0.4767,
+        "reliability_bins": [
+          {
+            "bin_range": [
+              0.0,
+              0.2
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.0482,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0482
+          },
+          {
+            "bin_range": [
+              0.2,
+              0.4
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.3828,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.3828
+          },
+          {
+            "bin_range": [
+              0.4,
+              0.6
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.4767,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.4767
+          },
+          {
+            "bin_range": [
+              0.6,
+              0.8
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.7,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.8,
+              1.0
+            ],
+            "sample_count": 12,
+            "mean_confidence": 0.9574,
+            "empirical_accuracy": 1.0,
+            "calibration_error": 0.0426
+          }
+        ]
+      },
+      "isotonic_regression": {
+        "brier_score": 0.0076,
+        "expected_calibration_error_ece": 0.0443,
+        "maximum_calibration_error_mce": 0.2649,
+        "reliability_bins": [
+          {
+            "bin_range": [
+              0.0,
+              0.2
+            ],
+            "sample_count": 2,
+            "mean_confidence": 0.096,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.096
+          },
+          {
+            "bin_range": [
+              0.2,
+              0.4
+            ],
+            "sample_count": 1,
+            "mean_confidence": 0.2649,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.2649
+          },
+          {
+            "bin_range": [
+              0.4,
+              0.6
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.5,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.6,
+              0.8
+            ],
+            "sample_count": 0,
+            "mean_confidence": 0.7,
+            "empirical_accuracy": 0.0,
+            "calibration_error": 0.0
+          },
+          {
+            "bin_range": [
+              0.8,
+              1.0
+            ],
+            "sample_count": 12,
+            "mean_confidence": 0.9827,
+            "empirical_accuracy": 1.0,
+            "calibration_error": 0.0173
+          }
+        ]
+      }
+    },
+    "ece_reduction": {
+      "temperature_scaling_delta": -0.1441,
+      "platt_scaling_delta": -0.0495,
+      "isotonic_regression_delta": -0.0998
+    }
+  }
+}
