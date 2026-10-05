@@ -1,0 +1,720 @@
+{
+  "experiment_id": "EXP-04-TEXT-BASELINE",
+  "name": "text_baseline_benchmark",
+  "description": "Formal Text-Only Baseline Benchmark (TF-IDF + LR, TF-IDF + MNB, Majority Prior)",
+  "config": {
+    "experiment_id": "EXP-04-TEXT-BASELINE",
+    "name": "text_baseline_benchmark",
+    "description": "Formal Text-Only Baseline Benchmark (TF-IDF + LR, TF-IDF + MNB, Majority Prior)",
+    "random_seed": 42,
+    "dataset": {
+      "name": "curated_verification_benchmark",
+      "source_path": "data/benchmark/text_baseline_benchmark.json",
+      "claim_reviews_path": "data/claim_reviews/reference_claim_reviews.json",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "train_ratio": 0.6,
+      "val_ratio": 0.2,
+      "test_ratio": 0.2,
+      "stratified": true,
+      "random_seed": 42
+    },
+    "model": {
+      "baseline_type": "tfidf_logistic_regression",
+      "ngram_range": [
+        1,
+        2
+      ],
+      "max_features": 5000,
+      "regularization_c": 1.0,
+      "class_weight": "balanced",
+      "calibrator": "temperature_scaling",
+      "temperature": 1.15,
+      "fusion_strategy": "calibrated_decision_matrix"
+    },
+    "output_dir": "research/results",
+    "artifacts_dir": "research/artifacts",
+    "save_predictions": true,
+    "extra_params": {}
+  },
+  "environment": {
+    "timestamp_utc": "2026-10-05T17:26:46.677402+00:00",
+    "python_version": "3.12.6",
+    "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 8,
+    "git": {
+      "commit": "ba13825aeb97796f12f02b1484115ac63c42d8ed",
+      "branch": "main",
+      "dirty": true
+    },
+    "packages": {
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "numpy": "2.5.3",
+      "pillow": "12.3.0",
+      "fastapi": "0.142.2",
+      "pydantic": "2.13.5",
+      "sqlalchemy": "2.1.3",
+      "matplotlib": "3.11.2",
+      "trafilatura": "2.3.0"
+    }
+  },
+  "elapsed_seconds": 0.0657,
+  "results": {
+    "benchmark_type": "RESEARCH_BENCHMARK",
+    "description": "Text-only baseline evaluation on verified benchmark split without external evidence retrieval",
+    "dataset_split": {
+      "train_samples": 35,
+      "test_samples": 15
+    },
+    "models": {
+      "tfidf_logistic_regression": {
+        "binary": {
+          "accuracy": 0.8667,
+          "macro_precision": 0.9286,
+          "macro_recall": 0.6667,
+          "macro_f1": 0.7115,
+          "weighted_f1": 0.8385,
+          "confusion_matrix": [
+            [
+              1,
+              2
+            ],
+            [
+              0,
+              12
+            ]
+          ],
+          "classes": [
+            "0",
+            "1"
+          ],
+          "classification_report": {
+            "0": {
+              "precision": 1.0,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.5,
+              "support": 3.0
+            },
+            "1": {
+              "precision": 0.8571428571428571,
+              "recall": 1.0,
+              "f1-score": 0.9230769230769231,
+              "support": 12.0
+            },
+            "accuracy": 0.8666666666666667,
+            "macro avg": {
+              "precision": 0.9285714285714286,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.7115384615384616,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.8857142857142857,
+              "recall": 0.8666666666666667,
+              "f1-score": 0.8384615384615385,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "1",
+            "1"
+          ],
+          "gold_targets": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ]
+        },
+        "five_class": {
+          "accuracy": 0.5333,
+          "macro_precision": 0.6133,
+          "macro_recall": 0.5333,
+          "macro_f1": 0.5276,
+          "weighted_f1": 0.5276,
+          "confusion_matrix": [
+            [
+              2,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              1
+            ]
+          ],
+          "classes": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "MISLEADING",
+            "OUTDATED",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "classification_report": {
+            "SUPPORTED": {
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.5714285714285714,
+              "support": 3.0
+            },
+            "CONTRADICTED": {
+              "precision": 0.5,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.4,
+              "support": 3.0
+            },
+            "MISLEADING": {
+              "precision": 0.4,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.5,
+              "support": 3.0
+            },
+            "OUTDATED": {
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.6666666666666666,
+              "support": 3.0
+            },
+            "INSUFFICIENT_EVIDENCE": {
+              "precision": 1.0,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.5,
+              "support": 3.0
+            },
+            "accuracy": 0.5333333333333333,
+            "macro avg": {
+              "precision": 0.6133333333333333,
+              "recall": 0.5333333333333333,
+              "f1-score": 0.5276190476190477,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.6133333333333333,
+              "recall": 0.5333333333333333,
+              "f1-score": 0.5276190476190477,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "MISLEADING",
+            "MISLEADING",
+            "CONTRADICTED",
+            "INSUFFICIENT_EVIDENCE",
+            "SUPPORTED",
+            "MISLEADING",
+            "MISLEADING",
+            "CONTRADICTED",
+            "MISLEADING",
+            "OUTDATED",
+            "SUPPORTED",
+            "OUTDATED",
+            "SUPPORTED",
+            "SUPPORTED",
+            "OUTDATED"
+          ],
+          "gold_targets": [
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "MISLEADING",
+            "MISLEADING",
+            "MISLEADING",
+            "OUTDATED",
+            "OUTDATED",
+            "OUTDATED",
+            "SUPPORTED",
+            "SUPPORTED",
+            "SUPPORTED"
+          ]
+        }
+      },
+      "tfidf_naive_bayes": {
+        "binary": {
+          "accuracy": 0.8,
+          "macro_precision": 0.4,
+          "macro_recall": 0.5,
+          "macro_f1": 0.4444,
+          "weighted_f1": 0.7111,
+          "confusion_matrix": [
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              12
+            ]
+          ],
+          "classes": [
+            "0",
+            "1"
+          ],
+          "classification_report": {
+            "0": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "1": {
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1-score": 0.8888888888888888,
+              "support": 12.0
+            },
+            "accuracy": 0.8,
+            "macro avg": {
+              "precision": 0.4,
+              "recall": 0.5,
+              "f1-score": 0.4444444444444444,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.6400000000000001,
+              "recall": 0.8,
+              "f1-score": 0.711111111111111,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1"
+          ],
+          "gold_targets": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ]
+        },
+        "five_class": {
+          "accuracy": 0.4667,
+          "macro_precision": 0.55,
+          "macro_recall": 0.4667,
+          "macro_f1": 0.4657,
+          "weighted_f1": 0.4657,
+          "confusion_matrix": [
+            [
+              2,
+              0,
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              1,
+              2,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              1,
+              0,
+              1
+            ]
+          ],
+          "classes": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "MISLEADING",
+            "OUTDATED",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "classification_report": {
+            "SUPPORTED": {
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.5714285714285714,
+              "support": 3.0
+            },
+            "CONTRADICTED": {
+              "precision": 0.5,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.4,
+              "support": 3.0
+            },
+            "MISLEADING": {
+              "precision": 0.25,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.2857142857142857,
+              "support": 3.0
+            },
+            "OUTDATED": {
+              "precision": 0.5,
+              "recall": 0.6666666666666666,
+              "f1-score": 0.5714285714285714,
+              "support": 3.0
+            },
+            "INSUFFICIENT_EVIDENCE": {
+              "precision": 1.0,
+              "recall": 0.3333333333333333,
+              "f1-score": 0.5,
+              "support": 3.0
+            },
+            "accuracy": 0.4666666666666667,
+            "macro avg": {
+              "precision": 0.55,
+              "recall": 0.4666666666666667,
+              "f1-score": 0.46571428571428564,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.55,
+              "recall": 0.4666666666666667,
+              "f1-score": 0.4657142857142857,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "MISLEADING",
+            "MISLEADING",
+            "CONTRADICTED",
+            "INSUFFICIENT_EVIDENCE",
+            "SUPPORTED",
+            "MISLEADING",
+            "OUTDATED",
+            "CONTRADICTED",
+            "MISLEADING",
+            "OUTDATED",
+            "SUPPORTED",
+            "OUTDATED",
+            "SUPPORTED",
+            "SUPPORTED",
+            "OUTDATED"
+          ],
+          "gold_targets": [
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "MISLEADING",
+            "MISLEADING",
+            "MISLEADING",
+            "OUTDATED",
+            "OUTDATED",
+            "OUTDATED",
+            "SUPPORTED",
+            "SUPPORTED",
+            "SUPPORTED"
+          ]
+        }
+      },
+      "majority_class_prior": {
+        "binary": {
+          "accuracy": 0.8,
+          "macro_precision": 0.4,
+          "macro_recall": 0.5,
+          "macro_f1": 0.4444,
+          "weighted_f1": 0.7111,
+          "confusion_matrix": [
+            [
+              0,
+              3
+            ],
+            [
+              0,
+              12
+            ]
+          ],
+          "classes": [
+            "0",
+            "1"
+          ],
+          "classification_report": {
+            "0": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "1": {
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1-score": 0.8888888888888888,
+              "support": 12.0
+            },
+            "accuracy": 0.8,
+            "macro avg": {
+              "precision": 0.4,
+              "recall": 0.5,
+              "f1-score": 0.4444444444444444,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.6400000000000001,
+              "recall": 0.8,
+              "f1-score": 0.711111111111111,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1"
+          ],
+          "gold_targets": [
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "1",
+            "0",
+            "0",
+            "0"
+          ]
+        },
+        "five_class": {
+          "accuracy": 0.2,
+          "macro_precision": 0.04,
+          "macro_recall": 0.2,
+          "macro_f1": 0.0667,
+          "weighted_f1": 0.0667,
+          "confusion_matrix": [
+            [
+              0,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              3,
+              0,
+              0,
+              0
+            ]
+          ],
+          "classes": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "MISLEADING",
+            "OUTDATED",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "classification_report": {
+            "SUPPORTED": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "CONTRADICTED": {
+              "precision": 0.2,
+              "recall": 1.0,
+              "f1-score": 0.3333333333333333,
+              "support": 3.0
+            },
+            "MISLEADING": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "OUTDATED": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "INSUFFICIENT_EVIDENCE": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1-score": 0.0,
+              "support": 3.0
+            },
+            "accuracy": 0.2,
+            "macro avg": {
+              "precision": 0.04,
+              "recall": 0.2,
+              "f1-score": 0.06666666666666667,
+              "support": 15.0
+            },
+            "weighted avg": {
+              "precision": 0.04000000000000001,
+              "recall": 0.2,
+              "f1-score": 0.06666666666666667,
+              "support": 15.0
+            }
+          },
+          "predictions": [
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED"
+          ],
+          "gold_targets": [
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "CONTRADICTED",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "INSUFFICIENT_EVIDENCE",
+            "MISLEADING",
+            "MISLEADING",
+            "MISLEADING",
+            "OUTDATED",
+            "OUTDATED",
+            "OUTDATED",
+            "SUPPORTED",
+            "SUPPORTED",
+            "SUPPORTED"
+          ]
+        }
+      }
+    }
+  }
+}
