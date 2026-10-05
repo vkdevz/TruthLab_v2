@@ -1,0 +1,41 @@
+# Version control
+.git
+.gitignore
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and uploads
+*.sqlite3
+*.sqlite3-journal
+uploads/*
+!uploads/.gitkeep
+
+# Frontend node modules & build artifacts
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+
+# System files
+.DS_Store
+Thumbs.db
+.env
+.env.local
+.idea/
+.vscode/
+
+# Large binaries or temporary scratch
+scratch/
+tmp/
+*.log
