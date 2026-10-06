@@ -263,6 +263,7 @@ class PipelineService:
                     "filename": file.filename,
                     "duration": video_forensics.duration_seconds,
                     "extracted_scenes": video_forensics.extracted_scenes,
+                    "transcript": transcript,
                 },
                 video_forensics=video_forensics,
                 ocr_text=overlay_ocr,
@@ -462,20 +463,28 @@ class PipelineService:
         confidences = [r.confidence for r in results]
         avg_conf = sum(confidences) / len(confidences) if confidences else 0.50
 
+        contradicted_count = sum(1 for v in verdicts if v == VeracityLabel.CONTRADICTED)
+        outdated_count = sum(1 for v in verdicts if v == VeracityLabel.OUTDATED)
+        misleading_count = sum(1 for v in verdicts if v == VeracityLabel.MISLEADING)
+        supported_count = sum(1 for v in verdicts if v == VeracityLabel.SUPPORTED)
+        insufficient_count = sum(1 for v in verdicts if v == VeracityLabel.INSUFFICIENT_EVIDENCE)
+
         # Precedence: CONTRADICTED > OUTDATED > MISLEADING > SUPPORTED > INSUFFICIENT_EVIDENCE
-        if VeracityLabel.CONTRADICTED in verdicts:
+        if contradicted_count > 0:
             return VeracityLabel.CONTRADICTED, min(0.96, avg_conf)
-        if VeracityLabel.OUTDATED in verdicts:
+        if outdated_count > 0:
             return VeracityLabel.OUTDATED, min(0.95, avg_conf)
-        if VeracityLabel.MISLEADING in verdicts:
+        if misleading_count > 0:
             return VeracityLabel.MISLEADING, min(0.90, avg_conf)
-        if all(v == VeracityLabel.SUPPORTED for v in verdicts):
-            return VeracityLabel.SUPPORTED, min(0.95, avg_conf)
+        if supported_count > 0 and contradicted_count == 0:
+            # Corroborated propositions without refutations
+            calibrated_conf = avg_conf if insufficient_count == 0 else max(0.65, avg_conf * 0.92)
+            return VeracityLabel.SUPPORTED, round(calibrated_conf, 3)
         if all(v == VeracityLabel.INSUFFICIENT_EVIDENCE for v in verdicts):
             return VeracityLabel.INSUFFICIENT_EVIDENCE, 0.45
 
-        # Mixed support/insufficient
-        return VeracityLabel.MISLEADING, round(avg_conf, 3)
+        # Inconclusive balance
+        return VeracityLabel.INSUFFICIENT_EVIDENCE, round(avg_conf, 3)
 
     def _generate_explanation(
         self,

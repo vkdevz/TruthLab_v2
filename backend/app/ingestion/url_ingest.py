@@ -185,7 +185,7 @@ class URLIngestionService:
         extracted_text = trafilatura.extract(
             html_content,
             include_comments=False,
-            include_tables=True,
+            include_tables=False,
             no_fallback=False
         )
 
