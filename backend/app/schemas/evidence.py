@@ -20,3 +20,4 @@ class EvidenceSnippet(BaseModel):
     )
     is_claim_review: bool = Field(default=False, description="Whether this source is an official ClaimReview fact-check")
     claim_review_rating: str | None = Field(default=None, description="Original rating if ClaimReview (e.g. 'False')")
+    provider: str = Field(default="Local ClaimReview Index", description="Source provider identifier")

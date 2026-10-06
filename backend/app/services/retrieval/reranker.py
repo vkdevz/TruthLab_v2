@@ -24,15 +24,19 @@ class EvidenceReranker:
                 norm_c = math.sqrt((claim_vec * claim_vec.T).toarray()[0][0])
                 norm_s = math.sqrt((snippet_vec * snippet_vec.T).toarray()[0][0])
                 
-                sim = dot / (norm_c * norm_s) if (norm_c * norm_s) > 0 else 0.1
+                sim = dot / (norm_c * norm_s) if (norm_c * norm_s) > 0 else 0.05
                 
-                # Boost and preserve match if official ClaimReview
+                # Boost verified expert fact-checks ONLY when semantically relevant
                 if item.is_claim_review:
-                    sim = max(item.retrieval_score, sim * 1.5, 0.85)
+                    # Verified ClaimReview matched by fact-check index: retain its authoritative score
+                    sim = max(item.retrieval_score, sim * 1.35)
                 else:
-                    sim = max(item.retrieval_score * 0.7, sim)
+                    if sim >= 0.10:
+                        sim = min(1.0, max(sim, item.retrieval_score * 0.85))
+                    else:
+                        sim = min(sim, 0.05)
                 
-                item.retrieval_score = round(max(0.1, min(1.0, float(sim))), 3)
+                item.retrieval_score = round(max(0.01, min(1.0, float(sim))), 3)
 
         except Exception:
             # Fallback to existing retrieval scores
