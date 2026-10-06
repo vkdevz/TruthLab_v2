@@ -13,13 +13,26 @@ class FFmpegProcessor:
     timestamp-preserving keyframe sampling, and video metadata extraction."""
 
     def __init__(self):
-        self.ffmpeg_path = shutil.which("ffmpeg")
-        self.ffprobe_path = shutil.which("ffprobe")
+        self.ffmpeg_path = self._find_bin("ffmpeg")
+        self.ffprobe_path = self._find_bin("ffprobe")
+
+    def _find_bin(self, name: str) -> str | None:
+        p = shutil.which(name)
+        if p:
+            return p
+        for candidate in [f"/opt/homebrew/bin/{name}", f"/usr/local/bin/{name}", f"/usr/bin/{name}"]:
+            if os.path.exists(candidate) and os.access(candidate, os.X_OK):
+                return candidate
+        return None
 
     def has_ffmpeg(self) -> bool:
+        if not self.ffmpeg_path:
+            self.ffmpeg_path = self._find_bin("ffmpeg")
         return self.ffmpeg_path is not None
 
     def has_ffprobe(self) -> bool:
+        if not self.ffprobe_path:
+            self.ffprobe_path = self._find_bin("ffprobe")
         return self.ffprobe_path is not None
 
     async def probe_metadata(self, video_path: Path | str, timeout_seconds: int = 15) -> dict[str, Any]:

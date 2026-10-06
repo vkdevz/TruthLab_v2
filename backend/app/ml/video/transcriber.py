@@ -13,7 +13,10 @@ class VideoTranscriber:
         if self._whisper_model is None:
             try:
                 import whisper
-                self._whisper_model = whisper.load_model("base.en")
+                try:
+                    self._whisper_model = whisper.load_model("tiny.en")
+                except Exception:
+                    self._whisper_model = whisper.load_model("base.en")
             except Exception:
                 self._whisper_model = False
         return self._whisper_model
@@ -27,7 +30,7 @@ class VideoTranscriber:
         model = self._get_model()
         if model:
             try:
-                result = model.transcribe(str(path))
+                result = model.transcribe(str(path), fp16=False)
                 raw_text = result.get("text", "").strip()
                 raw_segments = result.get("segments", [])
 
