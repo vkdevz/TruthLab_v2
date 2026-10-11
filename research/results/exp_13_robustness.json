@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:39:03.255037+00:00",
+    "timestamp_utc": "2026-10-11T14:57:15.051233+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "d9d9fb8ecebe8607ca055012035246de7a9ed91b",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0149,
+  "elapsed_seconds": 0.0116,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Systematic robustness evaluation across 8 perturbation modes",

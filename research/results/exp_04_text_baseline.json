@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:26:46.677402+00:00",
+    "timestamp_utc": "2026-10-11T14:57:22.410672+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "ba13825aeb97796f12f02b1484115ac63c42d8ed",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0657,
+  "elapsed_seconds": 0.0495,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Text-only baseline evaluation on verified benchmark split without external evidence retrieval",

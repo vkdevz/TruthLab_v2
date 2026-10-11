@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:35:27.930633+00:00",
+    "timestamp_utc": "2026-10-11T14:56:59.898184+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "14d8e3b8fa887ff1526910c7c238b2e9fa3e8f70",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0059,
+  "elapsed_seconds": 0.0057,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Comparative evaluation of uncalibrated vs calibrated confidence estimation",

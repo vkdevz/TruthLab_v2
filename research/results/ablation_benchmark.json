@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:31:26.447331+00:00",
+    "timestamp_utc": "2026-10-11T14:56:59.709932+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "f0fe42b0f869c51855d1b293f1c9cfc9987a78f6",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.056,
+  "elapsed_seconds": 0.0665,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Progressive ablation study from text-only baseline to full multimodal architecture",

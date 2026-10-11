@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:29:46.624653+00:00",
+    "timestamp_utc": "2026-10-11T14:57:00.351799+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "5e9550c87c60e8ff4e13570107a91707189be330",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0619,
+  "elapsed_seconds": 2.6326,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "sample_count": 15,
@@ -114,11 +114,11 @@
         ]
       },
       "proposed_evidence_system": {
-        "binary_accuracy": 0.9333,
-        "binary_macro_f1": 0.9068,
-        "five_class_accuracy": 0.7333,
-        "five_class_macro_f1": 0.6648,
-        "insufficient_evidence_recall": 0.6667,
+        "binary_accuracy": 1.0,
+        "binary_macro_f1": 1.0,
+        "five_class_accuracy": 0.8,
+        "five_class_macro_f1": 0.7333,
+        "insufficient_evidence_recall": 1.0,
         "confusion_matrix": [
           [
             3,
@@ -149,21 +149,21 @@
             0
           ],
           [
-            1,
             0,
             0,
             0,
-            2
+            0,
+            3
           ]
         ]
       },
       "improvements": {
-        "binary_macro_f1_delta": 0.1953,
-        "five_class_macro_f1_delta": 0.1371,
-        "insufficient_recall_delta": 0.3333
+        "binary_macro_f1_delta": 0.2885,
+        "five_class_macro_f1_delta": 0.2057,
+        "insufficient_recall_delta": 0.6667
       }
     },
-    "retrieval_grounding_ratio": 0.8667,
+    "retrieval_grounding_ratio": 0.8,
     "sample_evaluations": [
       {
         "id": "claim_con_008",
@@ -211,14 +211,14 @@
       },
       {
         "id": "claim_ins_012",
-        "predicted_5class": "SUPPORTED",
-        "predicted_binary": 0,
-        "confidence": 0.94,
-        "evidence_count": 1,
-        "supporting_count": 1,
+        "predicted_5class": "INSUFFICIENT_EVIDENCE",
+        "predicted_binary": 1,
+        "confidence": 0.45,
+        "evidence_count": 0,
+        "supporting_count": 0,
         "refuting_count": 0,
-        "temporal_status": "HISTORICAL",
-        "explanation": "Event date estimated from fact-check investigation date. Authoritative evidence corroborates the claim; media context is congruent."
+        "temporal_status": "UNKNOWN",
+        "explanation": "Evidence retrieval density below minimum statistical sufficiency threshold."
       },
       {
         "id": "claim_ins_008",
@@ -273,7 +273,7 @@
         "supporting_count": 0,
         "refuting_count": 1,
         "temporal_status": "OUTDATED",
-        "explanation": "Historical date '2017' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 3564 days to 2017-01-01. Geographic entity confirmed in evidence: united states Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+        "explanation": "Historical date '2017' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 3570 days to 2017-01-01. Geographic entity confirmed in evidence: united states Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
       },
       {
         "id": "claim_out_007",
@@ -295,7 +295,7 @@
         "supporting_count": 0,
         "refuting_count": 1,
         "temporal_status": "OUTDATED",
-        "explanation": "Historical date '2001' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 9408 days to 2001-01-01. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+        "explanation": "Historical date '2001' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 9414 days to 2001-01-01. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
       },
       {
         "id": "claim_sup_002",

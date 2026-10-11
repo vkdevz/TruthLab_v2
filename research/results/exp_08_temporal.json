@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:32:21.337377+00:00",
+    "timestamp_utc": "2026-10-11T14:57:17.464836+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "095a3088c05c450b532c595d81bedc3e71d67727",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.8719,
+  "elapsed_seconds": 0.9535,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Temporal verification and event vs publication date disambiguation benchmark",

@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:39:48.235687+00:00",
+    "timestamp_utc": "2026-10-11T14:57:00.291144+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "979a8b2faba6202b624fb66219acbe9ea7cfdc0e",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,33 +64,19 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0008,
+  "elapsed_seconds": 0.0006,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Systematic failure categorization on benchmark evaluation runs",
     "total_test_samples": 15,
-    "total_misclassifications": 4,
+    "total_misclassifications": 3,
     "category_counts": {
-      "RETRIEVAL_FAILURE": 1,
       "TEMPORAL_FAILURE": 3
     },
     "category_percentages": {
-      "RETRIEVAL_FAILURE": 25.0,
-      "TEMPORAL_FAILURE": 75.0
+      "TEMPORAL_FAILURE": 100.0
     },
     "failure_cases": [
-      {
-        "sample_id": "claim_ins_012",
-        "claim_text": "Unverified rumor claims an unnamed space agency detected a metallic obelisk floating near Jupiter's moon Callisto.",
-        "modality": "text",
-        "gold_verdict": "INSUFFICIENT_EVIDENCE",
-        "predicted_verdict": "SUPPORTED",
-        "confidence": 0.94,
-        "uncertainty_level": "LOW",
-        "primary_failure_category": "RETRIEVAL_FAILURE",
-        "root_cause_explanation": "Retrieved 1 tangential snippets that falsely inflated evidence sufficiency.",
-        "remediation_strategy": "Increase strictness of semantic relevance thresholding before admitting snippets to fusion."
-      },
       {
         "sample_id": "claim_out_004",
         "claim_text": "Recycled video shows airport flooding disaster happening today in Florida during hurricane season.",

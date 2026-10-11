@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-05T17:41:39.140715+00:00",
+    "timestamp_utc": "2026-10-11T14:57:15.157686+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "f4cd387cb94e0fc7feb8dbac308ef167d0a07d5f",
+      "commit": "5ab3a2664287c6941f2b21dcf189aedd14affb71",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 2.0963,
+  "elapsed_seconds": 2.2037,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Rigorous statistical significance and non-parametric bootstrap analysis",
@@ -78,15 +78,15 @@
           0.2331,
           0.7686
         ],
-        "system_f1_mean": 0.6514,
+        "system_f1_mean": 0.7289,
         "system_f1_95ci": [
-          0.4489,
-          0.8875
+          0.6,
+          1.0
         ],
-        "macro_f1_delta_mean": 0.1727,
+        "macro_f1_delta_mean": 0.2502,
         "macro_f1_delta_95ci": [
-          -0.1288,
-          0.5067
+          -0.0614,
+          0.5794
         ]
       },
       "binary_macro_f1": {
@@ -97,15 +97,15 @@
           0.4231,
           1.0
         ],
-        "system_f1_mean": 0.8953,
+        "system_f1_mean": 1.0,
         "system_f1_95ci": [
-          0.64,
+          1.0,
           1.0
         ],
-        "macro_f1_delta_mean": 0.1975,
+        "macro_f1_delta_mean": 0.3022,
         "macro_f1_delta_95ci": [
-          -0.36,
-          0.5556
+          0.0,
+          0.5769
         ]
       }
     },
@@ -115,24 +115,24 @@
         "contingency_table": {
           "both_correct_a": 6,
           "base_only_correct_b": 2,
-          "sys_only_correct_c": 5,
-          "both_incorrect_d": 2
+          "sys_only_correct_c": 6,
+          "both_incorrect_d": 1
         },
-        "discordant_pairs_b_plus_c": 7,
-        "two_tailed_p_value": 0.4531,
+        "discordant_pairs_b_plus_c": 8,
+        "two_tailed_p_value": 0.2891,
         "statistically_significant_at_05": false,
         "assumptions": "Paired nominal classifications on matched dataset samples; exact binomial used due to sample size."
       },
       "binary_mcnemar": {
         "test_name": "McNemar's Exact Binomial Test",
         "contingency_table": {
-          "both_correct_a": 12,
-          "base_only_correct_b": 1,
+          "both_correct_a": 13,
+          "base_only_correct_b": 0,
           "sys_only_correct_c": 2,
           "both_incorrect_d": 0
         },
-        "discordant_pairs_b_plus_c": 3,
-        "two_tailed_p_value": 1.0,
+        "discordant_pairs_b_plus_c": 2,
+        "two_tailed_p_value": 0.5,
         "statistically_significant_at_05": false,
         "assumptions": "Paired nominal classifications on matched dataset samples; exact binomial used due to sample size."
       }

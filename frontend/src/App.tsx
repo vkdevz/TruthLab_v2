@@ -4,8 +4,12 @@ import type {
   ClaimVerificationResult,
   ImageForensicIndicators,
   VideoForensicIndicators,
-  FullVerificationResponse 
+  FullVerificationResponse,
+  EvidenceGraph
 } from './types/verification';
+import { EvidenceGraphView } from './components/EvidenceGraphView';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 interface BenchmarkSample {
   title: string;
@@ -72,6 +76,8 @@ export function App() {
   const [executiveSummary, setExecutiveSummary] = useState<string>('');
   const [limitations, setLimitations] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [evidenceGraph, setEvidenceGraph] = useState<EvidenceGraph | null>(null);
+  const [viewMode, setViewMode] = useState<'LIST' | 'GRAPH'>('GRAPH');
 
   // Clean up object URLs to prevent memory leaks
   useEffect(() => {
@@ -108,6 +114,8 @@ export function App() {
     setVideoForensics(data.video_forensics || null);
     setOcrText(data.ocr_text || null);
     setTranscriptText(data.transcript_text || null);
+    setEvidenceGraph(data.evidence_graph || null);
+    setViewMode(data.evidence_graph && data.evidence_graph.nodes.length > 0 ? 'GRAPH' : 'LIST');
     setActiveClaimIdx(0);
     setEvidenceFilter('ALL');
   };
@@ -124,7 +132,7 @@ export function App() {
         }
 
         setProgressStage('Decomposing claims & querying evidence indices...');
-        const res = await fetch('http://localhost:8000/api/v1/verify/text', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/verify/text`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: inputText.trim() }),
@@ -143,7 +151,7 @@ export function App() {
         }
 
         setProgressStage('Validating Anti-SSRF constraints & fetching article content...');
-        const res = await fetch('http://localhost:8000/api/v1/verify/url', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/verify/url`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: inputUrl.trim() }),
@@ -165,7 +173,7 @@ export function App() {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const res = await fetch('http://localhost:8000/api/v1/verify/image', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/verify/image`, {
           method: 'POST',
           body: formData,
         });
@@ -186,7 +194,7 @@ export function App() {
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        const res = await fetch('http://localhost:8000/api/v1/verify/video', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/verify/video`, {
           method: 'POST',
           body: formData,
         });
@@ -606,13 +614,49 @@ export function App() {
           <div style={{ display: 'grid', gridTemplateColumns: imageForensics || videoForensics ? '2fr 1.1fr' : '1fr', gap: '24px' }}>
             {/* Left Column: Claims & Evidence */}
             <div className="glass-panel" style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
                   <span>🔍</span> Factual Evidence Verification
                 </h3>
-                <span style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
-                  Ground Truth Indices
-                </span>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'inline-flex', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '6px', padding: '3px', border: '1px solid var(--border-subtle)' }}>
+                    <button
+                      onClick={() => setViewMode('GRAPH')}
+                      style={{
+                        background: viewMode === 'GRAPH' ? 'linear-gradient(135deg, var(--accent-indigo), var(--accent-violet))' : 'transparent',
+                        color: viewMode === 'GRAPH' ? '#fff' : 'var(--text-muted)',
+                        border: 'none',
+                        padding: '4px 10px',
+                        borderRadius: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      🕸️ Evidence Graph
+                    </button>
+                    <button
+                      onClick={() => setViewMode('LIST')}
+                      style={{
+                        background: viewMode === 'LIST' ? 'linear-gradient(135deg, var(--accent-indigo), var(--accent-violet))' : 'transparent',
+                        color: viewMode === 'LIST' ? '#fff' : 'var(--text-muted)',
+                        border: 'none',
+                        padding: '4px 10px',
+                        borderRadius: '4px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      📄 Citations List
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+                    Ground Truth Indices
+                  </span>
+                </div>
               </div>
 
               {verifiedClaims.length > 0 ? (
@@ -659,6 +703,17 @@ export function App() {
                           )}
                         </div>
                       </div>
+
+                      {/* Interactive Graph View Rendering */}
+                      {viewMode === 'GRAPH' && evidenceGraph && (
+                        <div style={{ marginBottom: '20px' }}>
+                          <EvidenceGraphView
+                            graph={evidenceGraph}
+                            overallVerdict={overallVerdict}
+                            onSelectCitation={() => setViewMode('LIST')}
+                          />
+                        </div>
+                      )}
 
                       {/* Evidence Citations Header & Stance Filters */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>

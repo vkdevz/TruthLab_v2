@@ -66,16 +66,20 @@ class LocalClaimReviewProvider(EvidenceProvider):
         seen_urls = {r["url"] for r in all_recs}
 
         # Load reference claim reviews file if present
-        ref_file = Path("data/claim_reviews/reference_claim_reviews.json")
-        if ref_file.exists():
-            try:
-                data = json.loads(ref_file.read_text())
-                for item in data:
-                    if item.get("url") not in seen_urls:
-                        all_recs.append(item)
-                        seen_urls.add(item.get("url"))
-            except Exception:
-                pass
+        ref_files = [
+            settings.DATA_DIR / "claim_reviews" / "reference_claim_reviews.json",
+            Path("data/claim_reviews/reference_claim_reviews.json"),
+        ]
+        for ref_file in ref_files:
+            if ref_file.exists():
+                try:
+                    data = json.loads(ref_file.read_text())
+                    for item in data:
+                        if item.get("url") not in seen_urls:
+                            all_recs.append(item)
+                            seen_urls.add(item.get("url"))
+                except Exception:
+                    pass
 
         return all_recs
 
@@ -84,8 +88,8 @@ class LocalClaimReviewProvider(EvidenceProvider):
         return "Local ClaimReview Index"
 
     async def retrieve(self, query: str, claim_id: str, limit: int = 5) -> list[EvidenceSnippet]:
-        # Filter stop words and punctuation
-        query_words = [w.strip(" ,.?!'\"") for w in query.lower().split() if len(w) > 2]
+        # Filter stop words and punctuation (preserve 2-character domain terms like '5g', 'ai')
+        query_words = [w.strip(" ,.?!'\"") for w in query.lower().split() if len(w) >= 2]
         query_tokens = {w for w in query_words if w not in STOP_WORDS}
         results = []
 
@@ -93,7 +97,7 @@ class LocalClaimReviewProvider(EvidenceProvider):
             return []
 
         for idx, rec in enumerate(self.records):
-            rec_words = [w.strip(" ,.?!'\"") for w in rec["claim"].lower().split() if len(w) > 2]
+            rec_words = [w.strip(" ,.?!'\"") for w in rec["claim"].lower().split() if len(w) >= 2]
             rec_tokens = {w for w in rec_words if w not in STOP_WORDS}
             if not rec_tokens:
                 continue
@@ -104,9 +108,17 @@ class LocalClaimReviewProvider(EvidenceProvider):
             jaccard = len(intersection) / len(union) if union else 0.0
             relevance = max(containment, jaccard)
 
-            # Match if at least 1 key token matches with meaningful relevance (>= 0.15), or >= 2 tokens match
-            if (len(intersection) >= 2 and relevance >= 0.20) or (len(intersection) >= 1 and relevance >= 0.15):
-                stance = rec["stance"]
+            # Match if at least 2 tokens match with relevance >= 0.20, or 1 specific token with high relevance >= 0.35
+            if (len(intersection) >= 2 and relevance >= 0.20) or (len(intersection) >= 1 and relevance >= 0.35):
+                raw_stance = rec.get("stance", "NEUTRAL")
+                if isinstance(raw_stance, str):
+                    try:
+                        stance = StanceType(raw_stance)
+                    except ValueError:
+                        stance = StanceType.NEUTRAL
+                else:
+                    stance = raw_stance
+
                 probs = {
                     "SUPPORTS": 0.92 if stance == StanceType.SUPPORTS else 0.03,
                     "REFUTES": 0.92 if stance == StanceType.REFUTES else 0.03,

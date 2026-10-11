@@ -55,6 +55,16 @@ REFERENCE_CLAIM_REVIEWS = [
         "snippet": "India's space agency ISRO successfully landed the Chandrayaan-3 lander module Vikram on the Moon's southern polar region on August 23, 2023.",
         "stance": StanceType.SUPPORTS,
         "date": "2023-08-23T00:00:00Z"
+    },
+    {
+        "claim": "The Indian Ministry of Communications has officially banned all 5G network services nationwide",
+        "rating": "False",
+        "publisher": "PIB Fact Check / Department of Telecommunications",
+        "url": "https://pib.gov.in/FactCheck/5g-network-ban-hoax",
+        "domain": "pib.gov.in",
+        "snippet": "The Ministry of Communications and Department of Telecommunications (DoT) clarified that viral circulars claiming a nationwide ban on 5G network services in India are fraudulent and fake. No ban has been issued.",
+        "stance": StanceType.REFUTES,
+        "date": "2023-06-10T00:00:00Z"
     }
 ]
 

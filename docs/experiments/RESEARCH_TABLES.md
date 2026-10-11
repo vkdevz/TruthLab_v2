@@ -25,11 +25,11 @@ All metrics compiled deterministically from machine-readable experiment results 
 
 | Evaluation Metric | Text Baseline (TF-IDF+LR) | Proposed Evidence System | Relative Delta (Δ) |
 | --- | --- | --- | --- |
-| Binary Accuracy | 0.8667 | 0.9333 | +0.1953 |
-| Binary Macro-F1 | 0.7115 | 0.9068 | +0.1953 |
-| 5-Class Accuracy | 0.5333 | 0.7333 | +0.2 |
-| 5-Class Macro-F1 | 0.5276 | 0.6648 | +0.1371 |
-| Insufficient Evidence Recall | 0.3333 | 0.6667 | +0.3333 |
+| Binary Accuracy | 0.8667 | 1.0 | +0.2885 |
+| Binary Macro-F1 | 0.7115 | 1.0 | +0.2885 |
+| 5-Class Accuracy | 0.5333 | 0.8 | +0.2667 |
+| 5-Class Macro-F1 | 0.5276 | 0.7333 | +0.2057 |
+| Insufficient Evidence Recall | 0.3333 | 1.0 | +0.6667 |
 
 
 ## Table 3: Progressive Component Ablation
@@ -80,7 +80,6 @@ All metrics compiled deterministically from machine-readable experiment results 
 
 | Failure Category | Error Count | Percentage (%) | Primary Operational Impact |
 | --- | --- | --- | --- |
-| RETRIEVAL_FAILURE | 1 | 25.0% | Tangential semantic match |
-| TEMPORAL_FAILURE | 3 | 75.0% | Misjudged historical event anchor |
+| TEMPORAL_FAILURE | 3 | 100.0% | Misjudged historical event anchor |
 
 
