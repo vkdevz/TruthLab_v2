@@ -10,13 +10,13 @@ export const ArchitectureSection: React.FC = () => {
       mechanics: [
         "Pre-fetch DNS resolution blocking RFC 1918, RFC 3927, loopback, and metadata IPs (Anti-SSRF).",
         "Binary magic-byte container validation (\\xFF\\xD8\\xFF, \\x89PNG, ftyp, moov, \\x1A\\x45\\xDF\\xA3).",
-        "Payload quotas: <= 15MB images, <= 60MB videos, max duration <= 90s strictly enforced."
+        "Strict quotas: <= 15MB images, <= 60MB videos, duration <= 90s strictly enforced."
       ]
     },
     {
       num: "02",
       title: "Feature & Signal Extraction",
-      tag: "Multimodal Decomposition",
+      tag: "Decomposition",
       desc: "Parallel extraction pipelines across visual, auditory, and textual dimensions.",
       mechanics: [
         "FFmpeg demuxing audio tracks to 16kHz mono linear PCM WAV for Whisper ASR transcription.",
@@ -27,7 +27,7 @@ export const ArchitectureSection: React.FC = () => {
     {
       num: "03",
       title: "Hybrid Evidence Retrieval",
-      tag: "Dual-Channel Grounding",
+      tag: "Dual-Channel",
       desc: "Bridges local high-speed fact-check indices with live external encyclopedic APIs.",
       mechanics: [
         "Local ClaimReview index (sub-10ms fallback) loaded with verified benchmark truth sets.",
@@ -49,53 +49,70 @@ export const ArchitectureSection: React.FC = () => {
   ];
 
   return (
-    <section id="pipeline" className="py-16 px-6 max-w-7xl mx-auto border-t border-white/5">
-      <div className="mb-12">
-        <div className="flex items-center gap-2 font-mono text-xs text-sky-400 font-semibold mb-2">
-          <span>// PIPELINE SPECIFICATION</span>
+    <section id="pipeline" className="tl-section">
+      <div className="tl-container">
+        <div className="tl-section-header">
+          <span className="tl-tag">// PIPELINE SPECIFICATION</span>
+          <h2 className="tl-title">Multimodal Verification Architecture</h2>
+          <p className="tl-desc">
+            TruthLab operates as an asynchronous pipeline with mathematical logit calibration,
+            cross-modal consistency checks, and multi-tier evidentiary retrieval—rejecting ungrounded AI guesses.
+          </p>
         </div>
-        <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-          Multimodal Verification Architecture
-        </h2>
-        <p className="mt-3 text-slate-400 text-sm max-w-3xl leading-relaxed">
-          TruthLab operates as an asynchronous pipeline with mathematical logit calibration,
-          cross-modal consistency checks, and multi-tier evidentiary retrieval—rejecting ungrounded AI guesses.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stages.map((stage) => (
-          <div
-            key={stage.num}
-            className="p-6 rounded-xl bg-slate-900/60 border border-white/10 flex flex-col justify-between hover:border-indigo-500/40 transition-all relative overflow-hidden group"
-          >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full pointer-events-none group-hover:bg-indigo-500/10 transition-colors" />
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-mono text-2xl font-black text-indigo-400/80">{stage.num}</span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/5">
-                  {stage.tag}
-                </span>
+        <div className="tl-grid-4">
+          {stages.map((stage) => (
+            <div key={stage.num} className="tl-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                    {stage.num}
+                  </span>
+                  <span className="tl-badge">{stage.tag}</span>
+                </div>
+                <h3 className="tl-card-title" style={{ marginBottom: '8px' }}>{stage.title}</h3>
+                <p className="tl-card-text" style={{ marginBottom: '16px' }}>{stage.desc}</p>
+
+                <ul style={{ listStyle: 'none', borderTop: '1px solid var(--border-hairline)', paddingTop: '14px', margin: 0, paddingLeft: 0 }}>
+                  {stage.mechanics.map((m, idx) => (
+                    <li
+                      key={idx}
+                      style={{
+                        fontSize: '0.76rem',
+                        color: 'var(--text-secondary)',
+                        marginBottom: '8px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <span style={{ color: 'var(--status-blue)', fontFamily: 'var(--font-mono)' }}>›</span>
+                      <span>{m}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{stage.title}</h3>
-              <p className="text-xs text-slate-400 mb-4 leading-relaxed">{stage.desc}</p>
-              
-              <ul className="space-y-2 border-t border-white/5 pt-4">
-                {stage.mechanics.map((item, idx) => (
-                  <li key={idx} className="text-[11px] text-slate-300 flex items-start gap-2 leading-relaxed">
-                    <span className="text-sky-400 font-mono mt-0.5">›</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
 
-            <div className="mt-6 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Verified Module</span>
-              <span className="text-emerald-400 font-semibold">Ready ✓</span>
+              <div
+                style={{
+                  marginTop: '16px',
+                  paddingTop: '12px',
+                  borderTop: '1px solid var(--border-hairline)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.72rem',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                <span>Pipeline Stage</span>
+                <span style={{ color: 'var(--status-green)' }}>Verified ✓</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

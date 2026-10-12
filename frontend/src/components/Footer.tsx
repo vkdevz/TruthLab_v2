@@ -30,47 +30,57 @@ async with httpx.AsyncClient() as client:
 }`;
 
   return (
-    <footer id="api" className="border-t border-white/10 bg-[#070a0f] py-16 px-6 text-xs text-slate-400">
-      <div className="max-w-7xl mx-auto space-y-12">
-        {/* API Snippets & BibTeX */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* API Snippet */}
-          <div className="p-6 rounded-xl bg-slate-900/60 border border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="font-mono text-xs text-slate-300 font-semibold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <footer id="api" style={{ background: '#080a0f', borderTop: '1px solid var(--border-hairline)', padding: '64px 0 32px 0' }}>
+      <div className="tl-container">
+        <div className="tl-grid-2" style={{ marginBottom: '48px' }}>
+          {/* API Invocation */}
+          <div className="tl-card">
+            <div className="tl-card-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--status-green)' }}></span>
                 API Client Invocation
               </div>
-              <div className="flex rounded-md bg-black/40 p-1 border border-white/5 font-mono text-[11px]">
+              <div style={{ display: 'flex', gap: '4px' }}>
                 <button
                   onClick={() => setActiveSnippet('CURL')}
-                  className={`px-2.5 py-1 rounded transition-colors ${
-                    activeSnippet === 'CURL' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-                  }`}
+                  className="tl-btn"
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '0.72rem',
+                    fontFamily: 'var(--font-mono)',
+                    background: activeSnippet === 'CURL' ? 'var(--status-indigo)' : 'transparent',
+                    color: activeSnippet === 'CURL' ? '#fff' : 'var(--text-muted)',
+                  }}
                 >
                   cURL
                 </button>
                 <button
                   onClick={() => setActiveSnippet('PYTHON')}
-                  className={`px-2.5 py-1 rounded transition-colors ${
-                    activeSnippet === 'PYTHON' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
-                  }`}
+                  className="tl-btn"
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '0.72rem',
+                    fontFamily: 'var(--font-mono)',
+                    background: activeSnippet === 'PYTHON' ? 'var(--status-indigo)' : 'transparent',
+                    color: activeSnippet === 'PYTHON' ? '#fff' : 'var(--text-muted)',
+                  }}
                 >
                   Python
                 </button>
               </div>
             </div>
 
-            <pre className="p-4 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-sky-300 overflow-x-auto leading-relaxed">
+            <pre className="tl-code-box" style={{ fontSize: '0.74rem', color: 'var(--status-blue)', marginBottom: '12px' }}>
               <code>{activeSnippet === 'CURL' ? curlSnippet : pythonSnippet}</code>
             </pre>
-            <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
-              <span>Interactive Schema:</span>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Interactive Schema:</span>
               <a
                 href="/api/v1/docs"
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-400 hover:text-indigo-300 underline"
+                style={{ color: 'var(--status-indigo)', textDecoration: 'none' }}
               >
                 Open OpenAPI / Swagger Docs ↗
               </a>
@@ -78,36 +88,52 @@ async with httpx.AsyncClient() as client:
           </div>
 
           {/* BibTeX Citation */}
-          <div className="p-6 rounded-xl bg-slate-900/60 border border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="font-mono text-xs text-slate-300 font-semibold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+          <div className="tl-card">
+            <div className="tl-card-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--status-indigo)' }}></span>
                 Academic Citation (BibTeX)
               </div>
-              <span className="font-mono text-[11px] text-slate-500">Dissertation Defense</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                Dissertation Defense
+              </span>
             </div>
 
-            <pre className="p-4 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-slate-300 overflow-x-auto leading-relaxed">
+            <pre className="tl-code-box" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
               <code>{bibtexCitation}</code>
             </pre>
-            <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
-              <span>Artifacts:</span>
-              <span className="text-slate-400">DATASET_AUDIT.md | RESEARCH_TABLES.md</span>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Research Artifacts:</span>
+              <span style={{ color: 'var(--text-secondary)' }}>DATASET_AUDIT.md • RESEARCH_TABLES.md</span>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-slate-500">
-          <div>
-            TruthLab v2.0 • Multimodal Evidence-Aware Misinformation Verification System
-          </div>
-          <div className="flex items-center gap-4">
-            <a href="#workbench" className="hover:text-slate-300 transition-colors">Top ↑</a>
+        <div
+          style={{
+            borderTop: '1px solid var(--border-hairline)',
+            paddingTop: '24px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '16px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.72rem',
+            color: 'var(--text-muted)',
+          }}
+        >
+          <div>TruthLab v2.0 • Multimodal Evidence-Aware Misinformation Verification System</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <a href="#workbench" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Top ↑</a>
             <span>•</span>
-            <a href="/api/v1/health" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition-colors">System Health</a>
+            <a href="/api/v1/health" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
+              System Health
+            </a>
             <span>•</span>
-            <span className="text-emerald-400">Operational on :1234</span>
+            <span style={{ color: 'var(--status-green)' }}>Operational on :1234</span>
           </div>
         </div>
       </div>

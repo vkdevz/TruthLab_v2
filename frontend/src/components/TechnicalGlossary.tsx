@@ -5,12 +5,12 @@ export const TechnicalGlossary: React.FC = () => {
     {
       term: "Anti-SSRF Socket Shield",
       formula: "IP ∉ {RFC 1918, RFC 3927, 127.0.0.0/8, 169.254.169.254}",
-      definition: "Pre-fetch DNS resolution hook that resolves destination hostnames prior to HTTP request dispatch. Rejects private, loopback, link-local, and cloud metadata IPs to prevent internal network scanning."
+      definition: "Pre-fetch DNS resolution hook resolving destination hostnames before HTTP dispatch. Rejects private, loopback, link-local, and cloud metadata IPs to block internal intranet scanning."
     },
     {
       term: "Binary Magic Byte Validation",
       formula: "Header[0:4] == \\xFF\\xD8\\xFF | \\x89PNG | ftyp | \\x1A\\x45\\xDF\\xA3",
-      definition: "Inspection of raw leading file byte signatures before invoking media decoders. Enforces file identity at the byte level, neutralizing polyglot payload attacks and MIME-type header spoofing."
+      definition: "Inspection of raw leading file byte signatures before invoking media decoders. Enforces file identity at the byte level, neutralizing polyglot payload attacks and MIME spoofing."
     },
     {
       term: "Error Level Analysis (ELA)",
@@ -45,42 +45,55 @@ export const TechnicalGlossary: React.FC = () => {
   ];
 
   return (
-    <section id="glossary" className="py-16 px-6 max-w-7xl mx-auto border-t border-white/5">
-      <div className="mb-12">
-        <div className="flex items-center gap-2 font-mono text-xs text-sky-400 font-semibold mb-2">
-          <span>// RIGOROUS TECHNICAL GLOSSARY</span>
+    <section id="glossary" className="tl-section">
+      <div className="tl-container">
+        <div className="tl-section-header">
+          <span className="tl-tag">// RIGOROUS TECHNICAL GLOSSARY</span>
+          <h2 className="tl-title">Core Technical Terms & Mechanics</h2>
+          <p className="tl-desc">
+            Zero marketing fluff. Below are the exact architectural definitions, mathematical formulations, and
+            operational roles of the technologies powering TruthLab v2.
+          </p>
         </div>
-        <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-          Core Technical Terms & Mechanics
-        </h2>
-        <p className="mt-3 text-slate-400 text-sm max-w-3xl leading-relaxed">
-          Zero marketing fluff. Below are the exact architectural definitions, mathematical formulations, and
-          operational roles of the technologies powering TruthLab v2.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {glossaryTerms.map((item, idx) => (
-          <div
-            key={idx}
-            className="p-5 rounded-xl bg-slate-900/60 border border-white/10 hover:border-indigo-500/30 transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <h3 className="font-bold text-white text-base">{item.term}</h3>
-                <span className="font-mono text-[11px] text-slate-500">[{idx + 1}]</span>
+        <div className="tl-grid-2">
+          {glossaryTerms.map((item, idx) => (
+            <div
+              key={idx}
+              className="tl-card"
+              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+            >
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <h3 className="tl-card-title">{item.term}</h3>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    [{idx + 1}]
+                  </span>
+                </div>
+                <div className="tl-code-box" style={{ color: 'var(--status-blue)', marginBottom: '12px' }}>
+                  {item.formula}
+                </div>
+                <p className="tl-card-text" style={{ marginBottom: '14px' }}>{item.definition}</p>
               </div>
-              <div className="p-2.5 rounded bg-black/40 border border-white/5 font-mono text-[11px] text-sky-300 mb-3 overflow-x-auto">
-                {item.formula}
+
+              <div
+                style={{
+                  paddingTop: '10px',
+                  borderTop: '1px solid var(--border-hairline)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.72rem',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                <span>Mechanic Grounded</span>
+                <span style={{ color: 'var(--status-green)' }}>Strict Spec ✓</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">{item.definition}</p>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-500">
-              <span>Mechanic Grounded</span>
-              <span className="text-emerald-400">Strict Spec ✓</span>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

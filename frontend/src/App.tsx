@@ -287,36 +287,38 @@ export function App() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-main)' }}>
       <Navbar />
 
-      <div id="workbench" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+      <div id="workbench" className="tl-container" style={{ padding: '40px 24px' }}>
         {/* Header */}
-      <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '999px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '12px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-cyan)' }} className="pulsing-glow"></span>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-cyan)', letterSpacing: '0.05em' }}>v1.0.0-final • PRODUCTION VERIFICATION WORKBENCH</span>
+        <header style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '3px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--status-blue-bg)', border: '1px solid var(--status-blue-border)', marginBottom: '12px' }}>
+              <span className="tl-pulse-dot" style={{ background: 'var(--status-blue)' }}></span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--status-blue)', fontFamily: 'var(--font-mono)' }}>
+                RESEARCH ADJUDICATION TERMINAL
+              </span>
+            </div>
+            <h1 style={{ fontSize: '2rem', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: '6px' }}>
+              Multimodal Misinformation Verification System
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '780px', lineHeight: 1.5 }}>
+              Unified evidentiary reasoning across Plain Text, Article URLs, Screenshots, Memes, and Video Media.
+            </p>
           </div>
-          <h1 style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(135deg, #fff 40%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Multimodal Evidence-Aware Misinformation Verification System
-          </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '6px' }}>
-            Unified evidentiary reasoning across Plain Text, URLs, Screenshots, Memes, and Video Media.
-          </p>
-        </div>
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div className="glass-panel" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }}></span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-main)', fontWeight: 500 }}>Multimodal Engine Live</span>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div className="tl-card" style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="tl-pulse-dot"></span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>Engine Active :1234</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Benchmark Presets Toolbar */}
-      <section style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Viva Demo Presets:
-          </span>
+        {/* Benchmark Presets Toolbar */}
+        <section style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontWeight: 600, letterSpacing: '0.04em' }}>
+              PRESETS:
+            </span>
           {BENCHMARK_PRESETS.map((p, idx) => (
             <button
               key={idx}
