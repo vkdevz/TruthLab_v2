@@ -27,10 +27,10 @@ export const ArchitectureSection: React.FC = () => {
   return (
     <section id="architecture" className="m-section">
       <div className="m-container">
-        <div className="m-section-label">System Flow</div>
-        <h2 className="m-section-title">Verification Pipeline</h2>
+        <div className="m-section-label">Pipeline</div>
+        <h2 className="m-section-title">System Pipeline</h2>
         <p className="m-section-sub">
-          A four-stage asynchronous pipeline combining signal processing, external evidentiary grounding, and mathematical logit calibration.
+          A four-stage asynchronous architecture combining forensic media analysis, hybrid evidence retrieval, and calibrated decision logic.
         </p>
 
         <div className="m-grid-4">

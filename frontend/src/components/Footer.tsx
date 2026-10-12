@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
               TruthLab v2.0
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: '420px', lineHeight: 1.6 }}>
-              A research system for multimodal evidence-aware misinformation verification, forensic signal extraction, and calibrated epistemics.
+              Major project research implementation for multimodal factual claim verification and forensic signal extraction.
             </p>
           </div>
 
@@ -48,7 +48,7 @@ export const Footer: React.FC = () => {
         )}
 
         <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-          <div>TruthLab • Defense Build 2026</div>
+          <div>TruthLab • Major Project 2026</div>
           <div>Operating on localhost:1234</div>
         </div>
       </div>

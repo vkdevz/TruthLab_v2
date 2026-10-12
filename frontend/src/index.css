@@ -422,6 +422,69 @@ body {
   gap: 16px;
 }
 
+@media (max-width: 768px) {
+  .m-container {
+    padding: 0 16px;
+  }
+  .m-section {
+    padding: 48px 0;
+  }
+  .m-hero {
+    padding: 40px 0 20px 0;
+  }
+  .m-hero-title {
+    font-size: 1.65rem;
+    line-height: 1.25;
+  }
+  .m-hero-subtitle {
+    font-size: 0.88rem;
+  }
+  .m-console-card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+  .m-tabs-wrap {
+    width: 100%;
+  }
+  .m-tabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .m-tab-btn {
+    padding: 8px 2px;
+    font-size: 0.78rem;
+    text-align: center;
+  }
+  .m-action-btn {
+    width: 100%;
+    padding: 12px;
+  }
+  .m-presets-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .m-result-box {
+    padding: 16px;
+  }
+  .m-result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .m-grid-2, .m-grid-4 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .m-nav-links {
+    gap: 14px;
+  }
+  .m-nav-link:not(:first-child):not(:last-child) {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .m-grid-2, .m-grid-4 {
     grid-template-columns: 1fr;

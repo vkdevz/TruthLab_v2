@@ -12,7 +12,7 @@ export const Navbar: React.FC = () => {
 
         {/* Quiet Navigation Links */}
         <nav className="m-nav-links">
-          <a href="#workbench" className="m-nav-link">Workbench</a>
+          <a href="#workbench" className="m-nav-link">Verify</a>
           <a href="#architecture" className="m-nav-link">Architecture</a>
           <a href="#benchmarks" className="m-nav-link">Benchmarks</a>
           <a href="#methodology" className="m-nav-link">Methodology</a>

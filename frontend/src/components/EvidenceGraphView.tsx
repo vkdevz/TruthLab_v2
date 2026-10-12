@@ -195,10 +195,10 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
       </div>
 
       {/* SVG Canvas */}
-      <div style={{ width: '100%', overflowX: 'auto' }}>
+      <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          style={{ width: '100%', maxHeight: '420px', display: 'block' }}
+          style={{ width: '100%', minWidth: '580px', maxHeight: '420px', display: 'block' }}
         >
           <defs>
             {/* Arrowhead Markers */}

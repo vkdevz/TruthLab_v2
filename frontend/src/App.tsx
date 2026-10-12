@@ -244,13 +244,9 @@ export function App() {
       {/* Hero Section */}
       <section className="m-hero">
         <div className="m-container">
-          <div className="m-hero-pill">
-            <span className="m-hero-dot"></span>
-            <span>Multimodal Misinformation Verification Engine</span>
-          </div>
-          <h1 className="m-hero-title">Adjudicate Truth with Empirical Evidence</h1>
+          <h1 className="m-hero-title">Multimodal Misinformation Verification</h1>
           <p className="m-hero-subtitle">
-            Evidentiary reasoning and forensic signal extraction across Text, Article URLs, Images, and Video Media.
+            Cross-modal claim verification and forensic signal extraction across text, URLs, images, and video clips.
           </p>
         </div>
       </section>
@@ -359,13 +355,13 @@ export function App() {
               disabled={isProcessing}
               className="m-action-btn"
             >
-              {isProcessing ? 'Verifying...' : 'Verify Claim'}
+              {isProcessing ? 'Verifying...' : 'Verify'}
             </button>
           </div>
 
           {/* Quiet Presets Row */}
           <div className="m-presets-bar">
-            <span className="m-presets-label">EXAMPLES:</span>
+            <span className="m-presets-label">SAMPLE BENCHMARKS:</span>
             {BENCHMARK_PRESETS.map((p, idx) => (
               <button
                 key={idx}
@@ -400,7 +396,7 @@ export function App() {
                 </p>
                 {limitations.length > 0 && (
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-                    Notice: {limitations.join(' • ')}
+                    System constraints: {limitations.join(' • ')}
                   </div>
                 )}
               </div>

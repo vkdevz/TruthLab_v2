@@ -37,10 +37,10 @@ export const MethodologySection: React.FC = () => {
   return (
     <section id="methodology" className="m-section">
       <div className="m-container">
-        <div className="m-section-label">Technical Foundation</div>
-        <h2 className="m-section-title">Forensic Methodology & Guards</h2>
+        <div className="m-section-label">Methodology</div>
+        <h2 className="m-section-title">Detection Models & Security Guards</h2>
         <p className="m-section-sub">
-          Mathematical formulations and security mechanisms powering multimodal verification without speculative AI extrapolation.
+          Mathematical formulations, signal processing heuristics, and network security filters implemented across the system.
         </p>
 
         <div className="m-grid-2">
