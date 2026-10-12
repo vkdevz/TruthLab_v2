@@ -8,6 +8,12 @@ import type {
   EvidenceGraph
 } from './types/verification';
 import { EvidenceGraphView } from './components/EvidenceGraphView';
+import { Navbar } from './components/Navbar';
+import { ArchitectureSection } from './components/ArchitectureSection';
+import { ForensicsDeepDive } from './components/ForensicsDeepDive';
+import { ResearchBenchmarkTable } from './components/ResearchBenchmarkTable';
+import { TechnicalGlossary } from './components/TechnicalGlossary';
+import { Footer } from './components/Footer';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -278,8 +284,11 @@ export function App() {
   const vStyle = getVerdictStyle(overallVerdict);
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
-      {/* Header */}
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-main)' }}>
+      <Navbar />
+
+      <div id="workbench" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+        {/* Header */}
       <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '999px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', marginBottom: '12px' }}>
@@ -931,6 +940,13 @@ export function App() {
           </div>
         </section>
       )}
+      </div>
+
+      <ArchitectureSection />
+      <ForensicsDeepDive />
+      <ResearchBenchmarkTable />
+      <TechnicalGlossary />
+      <Footer />
     </div>
   );
 }
