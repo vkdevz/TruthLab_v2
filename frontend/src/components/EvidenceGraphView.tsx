@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { EvidenceGraph, GraphNode, VeracityLabel } from '../types/verification';
 
 interface EvidenceGraphViewProps {
@@ -20,33 +20,52 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
   onSelectCitation,
 }) => {
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean>(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+  const [layoutMode, setLayoutMode] = useState<'RADIAL' | 'TREE'>(
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 'TREE' : 'RADIAL'
+  );
 
-  const width = 860;
-  const height = 440;
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobileViewport(mobile);
+      setLayoutMode(mobile ? 'TREE' : 'RADIAL');
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const width = 840;
+  const height = 400;
   const centerX = width / 2;
   const centerY = height / 2;
 
-  // Compute node coordinates using a radial layout
-  const { nodePositions, edgeList } = useMemo(() => {
+  const { nodePositions, edgeList, claimNodes, evidenceNodes } = useMemo(() => {
     if (!graph || !graph.nodes || graph.nodes.length === 0) {
-      return { nodePositions: new Map<string, NodePosition>(), edgeList: [] };
+      return {
+        nodePositions: new Map<string, NodePosition>(),
+        edgeList: [],
+        claimNodes: [] as GraphNode[],
+        evidenceNodes: [] as GraphNode[],
+      };
     }
 
-    const claimNodes = graph.nodes.filter((n) => n.type === 'claim');
-    const evidenceNodes = graph.nodes.filter((n) => n.type !== 'claim');
+    const cNodes = graph.nodes.filter((n) => n.type === 'claim');
+    const eNodes = graph.nodes.filter((n) => n.type !== 'claim');
     const positions = new Map<string, NodePosition>();
 
-    // Position claim nodes at the center
-    if (claimNodes.length === 1) {
-      positions.set(claimNodes[0].id, {
-        node: claimNodes[0],
+    if (cNodes.length === 1) {
+      positions.set(cNodes[0].id, {
+        node: cNodes[0],
         x: centerX,
         y: centerY,
         isClaim: true,
       });
     } else {
-      const claimStepY = height / (claimNodes.length + 1);
-      claimNodes.forEach((c, idx) => {
+      const claimStepY = height / (cNodes.length + 1);
+      cNodes.forEach((c, idx) => {
         positions.set(c.id, {
           node: c,
           x: centerX + (idx % 2 === 0 ? -40 : 40),
@@ -56,13 +75,12 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
       });
     }
 
-    // Position evidence nodes in an ellipse around the center
-    const totalEvidence = evidenceNodes.length;
+    const totalEvidence = eNodes.length;
     if (totalEvidence > 0) {
-      const radiusX = Math.min(350, width * 0.40);
-      const radiusY = Math.min(160, height * 0.38);
+      const radiusX = Math.min(330, width * 0.39);
+      const radiusY = Math.min(145, height * 0.36);
 
-      evidenceNodes.forEach((ev, idx) => {
+      eNodes.forEach((ev, idx) => {
         const angle = (2 * Math.PI * idx) / totalEvidence - Math.PI / 2;
         const x = centerX + radiusX * Math.cos(angle);
         const y = centerY + radiusY * Math.sin(angle);
@@ -75,28 +93,31 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
       });
     }
 
-    return { nodePositions: positions, edgeList: graph.edges || [] };
+    return {
+      nodePositions: positions,
+      edgeList: graph.edges || [],
+      claimNodes: cNodes,
+      evidenceNodes: eNodes,
+    };
   }, [graph, centerX, centerY, width, height]);
 
   if (!graph || !graph.nodes || graph.nodes.length === 0) {
     return (
       <div
         style={{
-          background: 'rgba(10, 13, 20, 0.6)',
+          background: 'var(--bg-input)',
           border: '1px dashed var(--border-subtle)',
-          borderRadius: '12px',
-          padding: '40px 20px',
+          borderRadius: 'var(--radius-md)',
+          padding: '32px 16px',
           textAlign: 'center',
-          color: 'var(--text-dim)',
+          color: 'var(--text-muted)',
+          fontSize: '0.82rem',
         }}
       >
-        <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>🕸️</span>
-        <div style={{ fontWeight: 600, color: 'var(--text-muted)' }}>
-          No Evidence Graph Generated
+        <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+          No Topological Graph Available
         </div>
-        <p style={{ fontSize: '0.85rem', marginTop: '4px' }}>
-          Graph will populate when check-worthy propositions and corresponding evidence citations are retrieved.
-        </p>
+        <p>Graph populates when check-worthy propositions and evidence citations are linked.</p>
       </div>
     );
   }
@@ -104,215 +125,312 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
   const getRelationColor = (relation: string) => {
     switch (relation?.toUpperCase()) {
       case 'SUPPORTS':
-        return '#10b981'; // Green
+        return '#22c55e';
       case 'REFUTES':
-        return '#ef4444'; // Red
+        return '#ef4444';
       case 'NEUTRAL':
       default:
-        return '#94a3b8'; // Slate
+        return '#71717a';
     }
   };
 
   const getVerdictBorderColor = (verdict?: string | null) => {
     switch (verdict?.toUpperCase()) {
       case 'SUPPORTED':
-        return '#10b981';
+        return '#22c55e';
       case 'CONTRADICTED':
         return '#ef4444';
       case 'MISLEADING':
-        return '#f59e0b';
       case 'OUTDATED':
-        return '#8b5cf6';
+        return '#eab308';
       default:
-        return '#64748b';
+        return '#71717a';
     }
   };
 
   return (
-    <div
-      style={{
-        background: 'rgba(10, 14, 23, 0.75)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '12px',
-        padding: '20px',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
-    >
-      {/* Header and Legend */}
+    <div style={{ position: 'relative' }}>
+      {/* Header & Layout Switcher */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          gap: '12px',
-          marginBottom: '16px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-          paddingBottom: '12px',
+          gap: '10px',
+          marginBottom: '14px',
+          paddingBottom: '10px',
+          borderBottom: '1px solid var(--border-subtle)',
         }}
       >
-        <div>
-          <h4
-            style={{
-              fontSize: '0.95rem',
-              fontWeight: 700,
-              color: 'var(--accent-cyan)',
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            <span>🕸️</span> Directed Evidence Reasoning Graph
-          </h4>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-            Topological citation relationships with directional stance vectors
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            Evidence Topology
           </span>
+          {/* Legend */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '0.72rem', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#22c55e' }} />
+              Supports
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#ef4444' }} />
+              Refutes
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#71717a' }} />
+              Neutral
+            </span>
+          </div>
         </div>
 
-        {/* Legend */}
-        <div style={{ display: 'flex', gap: '14px', alignItems: 'center', fontSize: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span
-              style={{ width: '10px', height: '10px', borderRadius: '2px', background: '#10b981' }}
-            ></span>
-            <span style={{ color: 'var(--text-muted)' }}>Supports</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span
-              style={{ width: '10px', height: '10px', borderRadius: '2px', background: '#ef4444' }}
-            ></span>
-            <span style={{ color: 'var(--text-muted)' }}>Refutes</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span
-              style={{ width: '10px', height: '10px', borderRadius: '2px', background: '#94a3b8' }}
-            ></span>
-            <span style={{ color: 'var(--text-muted)' }}>Neutral</span>
-          </div>
+        {/* Toggle between Tree (Mobile Optimal) and Radial (Desktop Optimal) */}
+        <div style={{ display: 'inline-flex', background: 'var(--bg-subtle)', padding: '2px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+          <button
+            type="button"
+            onClick={() => setLayoutMode('TREE')}
+            style={{
+              background: layoutMode === 'TREE' ? 'var(--bg-card)' : 'transparent',
+              color: layoutMode === 'TREE' ? 'var(--text-primary)' : 'var(--text-muted)',
+              border: 'none',
+              padding: '3px 8px',
+              borderRadius: '4px',
+              fontSize: '0.7rem',
+              fontFamily: 'var(--font-mono)',
+              cursor: 'pointer',
+            }}
+          >
+            Tree {isMobileViewport ? '(Mobile)' : ''}
+          </button>
+          <button
+            type="button"
+            onClick={() => setLayoutMode('RADIAL')}
+            style={{
+              background: layoutMode === 'RADIAL' ? 'var(--bg-card)' : 'transparent',
+              color: layoutMode === 'RADIAL' ? 'var(--text-primary)' : 'var(--text-muted)',
+              border: 'none',
+              padding: '3px 8px',
+              borderRadius: '4px',
+              fontSize: '0.7rem',
+              fontFamily: 'var(--font-mono)',
+              cursor: 'pointer',
+            }}
+          >
+            Radial SVG
+          </button>
         </div>
       </div>
 
-      {/* SVG Canvas */}
-      <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
-          style={{ width: '100%', minWidth: '580px', maxHeight: '420px', display: 'block' }}
-        >
-          <defs>
-            {/* Arrowhead Markers */}
-            <marker
-              id="arrow-supports"
-              viewBox="0 0 10 10"
-              refX="18"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
-            </marker>
-            <marker
-              id="arrow-refutes"
-              viewBox="0 0 10 10"
-              refX="18"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444" />
-            </marker>
-            <marker
-              id="arrow-neutral"
-              viewBox="0 0 10 10"
-              refX="18"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
-            </marker>
-
-            {/* Radial Gradient Glow for Center Node */}
-            <radialGradient id="claimGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="rgba(56, 189, 248, 0.25)" />
-              <stop offset="100%" stopColor="rgba(56, 189, 248, 0)" />
-            </radialGradient>
-          </defs>
-
-          {/* Central Glow Effect */}
-          <circle cx={centerX} cy={centerY} r="180" fill="url(#claimGlow)" />
-
-          {/* Render Directed Edges */}
-          {edgeList.map((edge, idx) => {
-            const sourcePos = nodePositions.get(edge.source);
-            const targetPos = nodePositions.get(edge.target);
-            if (!sourcePos || !targetPos) return null;
-
-            const isHighlighted =
-              hoveredNodeId === edge.source || hoveredNodeId === edge.target;
-            const strokeColor = getRelationColor(edge.relation);
-            const markerType =
-              edge.relation === 'SUPPORTS'
-                ? 'url(#arrow-supports)'
-                : edge.relation === 'REFUTES'
-                ? 'url(#arrow-refutes)'
-                : 'url(#arrow-neutral)';
-
-            // Midpoint for curved path
-            const midX = (sourcePos.x + targetPos.x) / 2;
-            const midY = (sourcePos.y + targetPos.y) / 2 - 15;
-
+      {/* MODE 1: Dedicated Mobile-First Vertical Topological Tree */}
+      {layoutMode === 'TREE' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '4px 0' }}>
+          {/* Root Claim Node */}
+          {claimNodes.map((cNode) => {
+            const borderColor = getVerdictBorderColor(cNode.status || overallVerdict);
             return (
-              <g key={`edge-${idx}`}>
-                <path
-                  d={`M ${sourcePos.x} ${sourcePos.y} Q ${midX} ${midY} ${targetPos.x} ${targetPos.y}`}
-                  fill="none"
-                  stroke={strokeColor}
-                  strokeWidth={isHighlighted ? 3 : 1.8}
-                  strokeOpacity={isHighlighted ? 0.95 : 0.65}
-                  markerEnd={markerType}
-                  strokeDasharray={edge.relation === 'NEUTRAL' ? '4 3' : 'none'}
-                  style={{ transition: 'all 0.2s ease' }}
-                />
-                {/* Weight badge near curve midpoint */}
-                <rect
-                  x={midX - 16}
-                  y={midY - 9}
-                  width="32"
-                  height="16"
-                  rx="4"
-                  fill="rgba(15, 23, 42, 0.85)"
-                  stroke={strokeColor}
-                  strokeWidth="0.8"
-                />
-                <text
-                  x={midX}
-                  y={midY + 3}
-                  textAnchor="middle"
-                  fill={strokeColor}
-                  fontSize="9"
-                  fontFamily="monospace"
-                  fontWeight="bold"
-                >
-                  {(edge.weight ?? 0.85).toFixed(2)}
-                </text>
-              </g>
+              <div
+                key={cNode.id}
+                style={{
+                  background: 'var(--bg-card)',
+                  border: `1px solid ${borderColor}`,
+                  borderLeft: `4px solid ${borderColor}`,
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '12px 14px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                    Target Proposition
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', fontWeight: 600, color: borderColor }}>
+                    {cNode.status || overallVerdict}
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.84rem', fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.4 }}>
+                  {cNode.label}
+                </div>
+              </div>
             );
           })}
 
-          {/* Render Nodes */}
-          {Array.from(nodePositions.values()).map((pos) => {
-            const isHovered = hoveredNodeId === pos.node.id;
-            const isClaim = pos.isClaim;
+          {/* Connected Evidence Nodes along Vertical Spine */}
+          <div style={{ paddingLeft: '14px', borderLeft: '1px dashed var(--border-hover)', marginLeft: '12px', display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '4px' }}>
+            {evidenceNodes.map((evNode) => {
+              const matchingEdge = edgeList.find((e) => e.source === evNode.id || e.target === evNode.id);
+              const relation = matchingEdge?.relation || evNode.status || 'NEUTRAL';
+              const weight = matchingEdge?.weight ?? 0.85;
+              const relColor = getRelationColor(relation);
 
-            if (isClaim) {
-              const borderColor = getVerdictBorderColor(pos.node.status || overallVerdict);
-              const nodeWidth = 200;
-              const nodeHeight = 56;
+              return (
+                <div
+                  key={evNode.id}
+                  onClick={() => onSelectCitation && onSelectCitation(evNode.label)}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '10px',
+                    cursor: onSelectCitation ? 'pointer' : 'default',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: relColor, flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {evNode.label}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
+                    <span style={{ color: relColor, fontWeight: 600 }}>{relation}</span>
+                    <span style={{ color: 'var(--text-faint)' }}>({weight.toFixed(2)})</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        /* MODE 2: Desktop Radial SVG Canvas */
+        <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            style={{ width: '100%', minWidth: '560px', maxHeight: '390px', display: 'block' }}
+          >
+            <defs>
+              <marker id="arrow-supports" viewBox="0 0 10 10" refX="18" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#22c55e" />
+              </marker>
+              <marker id="arrow-refutes" viewBox="0 0 10 10" refX="18" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444" />
+              </marker>
+              <marker id="arrow-neutral" viewBox="0 0 10 10" refX="18" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#71717a" />
+              </marker>
+            </defs>
+
+            {/* Render Directed Edges */}
+            {edgeList.map((edge, idx) => {
+              const sourcePos = nodePositions.get(edge.source);
+              const targetPos = nodePositions.get(edge.target);
+              if (!sourcePos || !targetPos) return null;
+
+              const isHighlighted = hoveredNodeId === edge.source || hoveredNodeId === edge.target;
+              const strokeColor = getRelationColor(edge.relation);
+              const markerType =
+                edge.relation === 'SUPPORTS'
+                  ? 'url(#arrow-supports)'
+                  : edge.relation === 'REFUTES'
+                  ? 'url(#arrow-refutes)'
+                  : 'url(#arrow-neutral)';
+
+              const midX = (sourcePos.x + targetPos.x) / 2;
+              const midY = (sourcePos.y + targetPos.y) / 2 - 14;
+
+              return (
+                <g key={`edge-${idx}`}>
+                  <path
+                    d={`M ${sourcePos.x} ${sourcePos.y} Q ${midX} ${midY} ${targetPos.x} ${targetPos.y}`}
+                    fill="none"
+                    stroke={strokeColor}
+                    strokeWidth={isHighlighted ? 2.5 : 1.5}
+                    strokeOpacity={isHighlighted ? 0.95 : 0.6}
+                    markerEnd={markerType}
+                    strokeDasharray={edge.relation === 'NEUTRAL' ? '4 3' : 'none'}
+                  />
+                  <rect
+                    x={midX - 16}
+                    y={midY - 8}
+                    width="32"
+                    height="15"
+                    rx="3"
+                    fill="#111114"
+                    stroke={strokeColor}
+                    strokeWidth="0.8"
+                  />
+                  <text
+                    x={midX}
+                    y={midY + 2}
+                    textAnchor="middle"
+                    fill={strokeColor}
+                    fontSize="8.5"
+                    fontFamily="monospace"
+                    fontWeight="600"
+                  >
+                    {(edge.weight ?? 0.85).toFixed(2)}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Render Nodes */}
+            {Array.from(nodePositions.values()).map((pos) => {
+              const isHovered = hoveredNodeId === pos.node.id;
+              if (pos.isClaim) {
+                const borderColor = getVerdictBorderColor(pos.node.status || overallVerdict);
+                const nodeWidth = 200;
+                const nodeHeight = 54;
+
+                return (
+                  <g
+                    key={pos.node.id}
+                    transform={`translate(${pos.x - nodeWidth / 2}, ${pos.y - nodeHeight / 2})`}
+                    onMouseEnter={() => setHoveredNodeId(pos.node.id)}
+                    onMouseLeave={() => setHoveredNodeId(null)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <rect
+                      width={nodeWidth}
+                      height={nodeHeight}
+                      rx="8"
+                      fill="#111114"
+                      stroke={borderColor}
+                      strokeWidth={isHovered ? 2.5 : 1.5}
+                    />
+                    <text
+                      x={nodeWidth / 2}
+                      y="17"
+                      textAnchor="middle"
+                      fill="#a1a1aa"
+                      fontSize="9"
+                      fontFamily="monospace"
+                      letterSpacing="0.05em"
+                    >
+                      PROPOSITION
+                    </text>
+                    <text
+                      x={nodeWidth / 2}
+                      y="33"
+                      textAnchor="middle"
+                      fill="#fafafa"
+                      fontSize="10.5"
+                      fontWeight="600"
+                    >
+                      {pos.node.label.length > 26 ? `${pos.node.label.slice(0, 24)}...` : pos.node.label}
+                    </text>
+                    {pos.node.status && (
+                      <text
+                        x={nodeWidth / 2}
+                        y="46"
+                        textAnchor="middle"
+                        fill={borderColor}
+                        fontSize="8.5"
+                        fontFamily="monospace"
+                        fontWeight="600"
+                      >
+                        {pos.node.status}
+                      </text>
+                    )}
+                  </g>
+                );
+              }
+
+              const nodeWidth = 140;
+              const nodeHeight = 42;
+              const stanceColor = getRelationColor(pos.node.status || 'NEUTRAL');
 
               return (
                 <g
@@ -320,126 +438,32 @@ export const EvidenceGraphView: React.FC<EvidenceGraphViewProps> = ({
                   transform={`translate(${pos.x - nodeWidth / 2}, ${pos.y - nodeHeight / 2})`}
                   onMouseEnter={() => setHoveredNodeId(pos.node.id)}
                   onMouseLeave={() => setHoveredNodeId(null)}
+                  onClick={() => onSelectCitation && onSelectCitation(pos.node.label)}
                   style={{ cursor: 'pointer' }}
                 >
                   <rect
                     width={nodeWidth}
                     height={nodeHeight}
-                    rx="12"
-                    fill="rgba(15, 23, 42, 0.92)"
-                    stroke={borderColor}
-                    strokeWidth={isHovered ? 3 : 2}
-                    filter="drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6))"
-                    style={{ transition: 'all 0.2s ease' }}
+                    rx="6"
+                    fill="#16161a"
+                    stroke={isHovered ? stanceColor : '#27272a'}
+                    strokeWidth={isHovered ? 1.8 : 1}
                   />
-                  <text
-                    x={nodeWidth / 2}
-                    y="18"
-                    textAnchor="middle"
-                    fill="var(--accent-cyan)"
-                    fontSize="10"
-                    fontWeight="bold"
-                    letterSpacing="0.05em"
-                  >
-                    TARGET PROPOSITION
+                  <circle cx="14" cy={nodeHeight / 2} r="4" fill={stanceColor} />
+                  <text x="25" y="19" fill="#fafafa" fontSize="10.5" fontWeight="500">
+                    {pos.node.label.length > 15 ? `${pos.node.label.slice(0, 14)}...` : pos.node.label}
                   </text>
-                  <text
-                    x={nodeWidth / 2}
-                    y="36"
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize="11"
-                    fontWeight="600"
-                  >
-                    {pos.node.label.length > 28
-                      ? `${pos.node.label.slice(0, 26)}...`
-                      : pos.node.label}
+                  <text x="25" y="32" fill={stanceColor} fontSize="8.5" fontFamily="monospace" fontWeight="600">
+                    {pos.node.status || 'SOURCE'}
                   </text>
-                  {pos.node.status && (
-                    <text
-                      x={nodeWidth / 2}
-                      y="49"
-                      textAnchor="middle"
-                      fill={borderColor}
-                      fontSize="9"
-                      fontWeight="bold"
-                    >
-                      [{pos.node.status}]
-                    </text>
-                  )}
                 </g>
               );
-            }
-
-            // Evidence Node (Orbiting)
-            const nodeWidth = 140;
-            const nodeHeight = 44;
-            const stanceColor = getRelationColor(pos.node.status || 'NEUTRAL');
-
-            return (
-              <g
-                key={pos.node.id}
-                transform={`translate(${pos.x - nodeWidth / 2}, ${pos.y - nodeHeight / 2})`}
-                onMouseEnter={() => setHoveredNodeId(pos.node.id)}
-                onMouseLeave={() => setHoveredNodeId(null)}
-                onClick={() => onSelectCitation && onSelectCitation(pos.node.label)}
-                style={{ cursor: 'pointer' }}
-              >
-                <rect
-                  width={nodeWidth}
-                  height={nodeHeight}
-                  rx="8"
-                  fill="rgba(24, 30, 48, 0.88)"
-                  stroke={isHovered ? stanceColor : 'rgba(255, 255, 255, 0.15)'}
-                  strokeWidth={isHovered ? 2 : 1}
-                  style={{ transition: 'all 0.2s ease' }}
-                />
-                <circle cx="16" cy={nodeHeight / 2} r="5" fill={stanceColor} />
-                <text
-                  x="28"
-                  y="20"
-                  fill="#fff"
-                  fontSize="11"
-                  fontWeight="600"
-                >
-                  {pos.node.label.length > 15
-                    ? `${pos.node.label.slice(0, 14)}...`
-                    : pos.node.label}
-                </text>
-                <text
-                  x="28"
-                  y="34"
-                  fill={stanceColor}
-                  fontSize="9"
-                  fontWeight="bold"
-                >
-                  {pos.node.status || 'EVIDENCE'}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* Footer Info Strip */}
-      <div
-        style={{
-          marginTop: '12px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '0.75rem',
-          color: 'var(--text-dim)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-          paddingTop: '8px',
-        }}
-      >
-        <span>
-          Showing {edgeList.length} relation edge(s) across {nodePositions.size} topological entity nodes.
-        </span>
-        <span>Click an evidence node to inspect matching citation.</span>
-      </div>
+            })}
+          </svg>
+        </div>
+      )}
     </div>
   );
 };
+
 export default EvidenceGraphView;

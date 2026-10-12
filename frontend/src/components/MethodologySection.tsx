@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export const MethodologySection: React.FC = () => {
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
+
   const methods = [
     {
       title: "Error Level Analysis (ELA)",
@@ -43,7 +45,8 @@ export const MethodologySection: React.FC = () => {
           Mathematical formulations, signal processing heuristics, and network security filters implemented across the system.
         </p>
 
-        <div className="m-grid-2">
+        {/* Desktop 2-Column Grid */}
+        <div className="m-grid-2 m-desktop-only">
           {methods.map((m, idx) => (
             <div key={idx} className="m-card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
@@ -55,6 +58,46 @@ export const MethodologySection: React.FC = () => {
               <p className="m-card-desc">{m.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* Dedicated Mobile Accordion Stack (Miller's Law Cognitive Load Reduction) */}
+        <div className="m-mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {methods.map((m, idx) => {
+            const isOpen = expandedIdx === idx;
+            return (
+              <div key={idx} className="m-card" style={{ padding: '14px 16px' }}>
+                <button
+                  type="button"
+                  onClick={() => setExpandedIdx(isOpen ? null : idx)}
+                  style={{
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    padding: 0,
+                    color: 'var(--text-primary)',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{m.title}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    {isOpen ? '−' : '+'}
+                  </span>
+                </button>
+                {isOpen && (
+                  <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
+                    <div className="m-code" style={{ marginBottom: '10px', fontSize: '0.74rem' }}>
+                      {m.metric}
+                    </div>
+                    <p className="m-card-desc" style={{ fontSize: '0.8rem' }}>{m.desc}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
