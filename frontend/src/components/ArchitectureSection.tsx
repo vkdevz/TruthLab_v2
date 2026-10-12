@@ -33,7 +33,8 @@ export const ArchitectureSection: React.FC = () => {
           A four-stage asynchronous architecture combining forensic media analysis, hybrid evidence retrieval, and calibrated decision logic.
         </p>
 
-        <div className="m-grid-4">
+        {/* Desktop 4-Column Pipeline Grid */}
+        <div className="m-grid-4 m-desktop-only">
           {steps.map((s) => (
             <div key={s.step} className="m-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
@@ -42,6 +43,22 @@ export const ArchitectureSection: React.FC = () => {
                 </div>
                 <h3 className="m-card-title">{s.title}</h3>
                 <p className="m-card-desc">{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Dedicated Mobile Connected Vertical Timeline */}
+        <div className="m-mobile-only m-timeline">
+          {steps.map((s, idx) => (
+            <div key={s.step} className="m-timeline-item">
+              <div className="m-timeline-rail">
+                <span className="m-timeline-node">{s.step}</span>
+                {idx < steps.length - 1 && <span className="m-timeline-line" />}
+              </div>
+              <div className="m-timeline-content">
+                <h3 className="m-card-title" style={{ marginBottom: '4px', fontSize: '0.9rem' }}>{s.title}</h3>
+                <p className="m-card-desc" style={{ fontSize: '0.79rem', lineHeight: 1.5 }}>{s.desc}</p>
               </div>
             </div>
           ))}

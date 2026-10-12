@@ -555,12 +555,61 @@ body {
 }
 
 /* Desktop vs Dedicated Mobile Viewport Helpers */
-.m-mobile-only {
-  display: none !important;
+@media (min-width: 769px) {
+  .m-mobile-only {
+    display: none !important;
+  }
 }
 
-.m-desktop-only {
-  display: block;
+/* Mobile Connected Vertical Pipeline Timeline */
+.m-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.m-timeline-item {
+  display: flex;
+  gap: 14px;
+}
+
+.m-timeline-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.m-timeline-node {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-focus);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.m-timeline-line {
+  width: 1px;
+  flex: 1;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}
+
+.m-timeline-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  flex: 1;
 }
 
 /* Dedicated Mobile Bottom Tab Bar (Thumb-Zone Ergonomics) */
@@ -634,12 +683,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  .m-mobile-only {
-    display: flex !important;
-  }
-  nav.m-bottom-nav.m-mobile-only {
-    display: grid !important;
-  }
   .m-desktop-only {
     display: none !important;
   }

@@ -97,6 +97,27 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    const onScroll = () => {
+      const scrollY = window.scrollY + 180;
+      const methodsEl = document.getElementById('methodology');
+      const benchEl = document.getElementById('benchmarks');
+      const archEl = document.getElementById('architecture');
+
+      if (methodsEl && scrollY >= methodsEl.offsetTop) {
+        setMobileSection('METHODS');
+      } else if (benchEl && scrollY >= benchEl.offsetTop) {
+        setMobileSection('BENCHMARKS');
+      } else if (archEl && scrollY >= archEl.offsetTop) {
+        setMobileSection('PIPELINE');
+      } else {
+        setMobileSection('VERIFY');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
     if (selectedFile) {
       const objectUrl = URL.createObjectURL(selectedFile);
       setFilePreviewUrl(objectUrl);
@@ -283,30 +304,23 @@ export function App() {
   const currentClaim = verifiedClaims[activeClaimIdx] || null;
   const topProofSnippet = currentClaim?.evidence_items?.[0] || null;
 
-  const showVerify = !isMobile || mobileSection === 'VERIFY';
-  const showPipeline = !isMobile || mobileSection === 'PIPELINE';
-  const showBenchmarks = !isMobile || mobileSection === 'BENCHMARKS';
-  const showMethods = !isMobile || mobileSection === 'METHODS';
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
 
-      {showVerify && (
-        <>
-          {/* Hero Section */}
-          <section className="m-hero">
-            <div className="m-container">
-              <h1 className="m-hero-title">Multimodal Misinformation Verification</h1>
-              <p className="m-hero-subtitle">
-                Cross-modal claim verification and forensic signal extraction across text, URLs, images, and video clips.
-              </p>
-            </div>
-          </section>
+      {/* Hero Section */}
+      <section className="m-hero">
+        <div className="m-container">
+          <h1 className="m-hero-title">Multimodal Misinformation Verification</h1>
+          <p className="m-hero-subtitle">
+            Cross-modal claim verification and forensic signal extraction across text, URLs, images, and video clips.
+          </p>
+        </div>
+      </section>
 
-          {/* Main Verification Workbench */}
-          <main id="workbench" className="m-container" style={{ paddingBottom: isMobile ? '32px' : '60px', width: '100%' }}>
-            <div className="m-console-card">
+      {/* Main Verification Workbench */}
+      <main id="workbench" className="m-container" style={{ paddingBottom: isMobile ? '32px' : '60px', width: '100%' }}>
+        <div className="m-console-card">
               {/* Segmented Modality Selector */}
               <div className="m-tabs-wrap">
                 <div className="m-tabs">
@@ -648,13 +662,11 @@ export function App() {
               </div>
             )}
           </main>
-        </>
-      )}
 
-      {/* Secondary Research Sections (Tab-switched on Mobile, Continuous on Desktop) */}
-      {showPipeline && <ArchitectureSection />}
-      {showBenchmarks && <ResearchBenchmarkTable />}
-      {showMethods && <MethodologySection />}
+      {/* Secondary Research Sections (Each renders its dedicated Mobile layout on <768px and Desktop layout on >=768px) */}
+      <ArchitectureSection />
+      <ResearchBenchmarkTable />
+      <MethodologySection />
       <Footer />
 
       {/* Dedicated Mobile Bottom Tab Bar */}

@@ -11,11 +11,11 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   activeSection,
   onSelectSection,
 }) => {
-  const navItems: { id: MobileSectionTab; label: string; symbol: string }[] = [
-    { id: 'VERIFY', label: 'Verify', symbol: '◉' },
-    { id: 'PIPELINE', label: 'Pipeline', symbol: '◫' },
-    { id: 'BENCHMARKS', label: 'Evaluation', symbol: '▤' },
-    { id: 'METHODS', label: 'Methods', symbol: '⌬' },
+  const navItems: { id: MobileSectionTab; label: string; symbol: string; targetId: string }[] = [
+    { id: 'VERIFY', label: 'Verify', symbol: '◉', targetId: 'workbench' },
+    { id: 'PIPELINE', label: 'Pipeline', symbol: '◫', targetId: 'architecture' },
+    { id: 'BENCHMARKS', label: 'Evaluation', symbol: '▤', targetId: 'benchmarks' },
+    { id: 'METHODS', label: 'Methods', symbol: '⌬', targetId: 'methodology' },
   ];
 
   return (
@@ -28,7 +28,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             type="button"
             onClick={() => {
               onSelectSection(item.id);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              const el = document.getElementById(item.targetId);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
             }}
             className={`m-bottom-nav-item ${isActive ? 'active' : ''}`}
           >
