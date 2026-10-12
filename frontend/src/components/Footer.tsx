@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '32px', marginBottom: '48px' }}>
           <div>
             <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: '6px' }}>
-              TruthLab v2.0
+              TruthLab
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', maxWidth: '420px', lineHeight: 1.6 }}>
               Major project research implementation for multimodal factual claim verification and forensic signal extraction.

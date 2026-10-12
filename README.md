@@ -1,6 +1,6 @@
 # Multimodal Evidence-Aware Misinformation Verification System
 
-[![Version](https://img.shields.io/badge/version-1.0.0--final-blue.svg)](https://github.com/vkdevz/TruthLab_v2)
+[![Version](https://img.shields.io/badge/version-1.0.0--final-blue.svg)](https://github.com/vkdevz/TruthLab)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://react.dev)
@@ -138,8 +138,8 @@ In adherence to strict scientific integrity standards:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/vkdevz/TruthLab_v2.git
-cd TruthLab_v2
+git clone https://github.com/vkdevz/TruthLab.git
+cd TruthLab
 
 # 2. Set up Python virtual environment
 python3.12 -m venv .venv
@@ -149,13 +149,13 @@ pip install -e .
 # 3. Start Backend API Server (Port 8000)
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 
-# 4. Start Frontend Workbench (Port 5173 / 5174 / 5175)
+# 4. Start Frontend Workbench (Port 1234)
 cd frontend
 npm install
-npm run dev
+npm run dev -- --port 1234
 ```
 
-Visit the interactive workbench at `http://localhost:5173` or Swagger API documentation at `http://localhost:8000/api/v1/docs`.
+Visit the interactive workbench at `http://localhost:1234` or Swagger API documentation at `http://localhost:8000/api/v1/docs`.
 
 ### Running with Docker & Docker-Compose
 

@@ -1,13 +1,13 @@
 #!/bin/bash
 # ==============================================================================
-# TruthLab v2: Unified Local Launcher (Backend Port 8000 + Frontend Port 1234)
+# TruthLab: Unified Local Launcher (Backend Port 8000 + Frontend Port 1234)
 # ==============================================================================
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
 
 echo "======================================================================"
-echo "  🚀 Starting TruthLab v2 Multimodal Verification System"
+echo "  🚀 Starting TruthLab Multimodal Verification System"
 echo "======================================================================"
 
 # Check if ports 8000 or 1234 are in use and kill if necessary
@@ -50,7 +50,7 @@ trap cleanup SIGINT SIGTERM EXIT
 
 echo ""
 echo "======================================================================"
-echo "  ✨ TruthLab v2 is LIVE!"
+echo "  ✨ TruthLab is LIVE!"
 echo "  🌐 Web Dashboard:    http://localhost:1234"
 echo "  📚 API Docs:         http://localhost:1234/api/v1/docs"
 echo "  ❤️  Health Check:     http://localhost:1234/api/v1/health"
