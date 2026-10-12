@@ -1,114 +1,47 @@
 import React from 'react';
 
 export const ArchitectureSection: React.FC = () => {
-  const stages = [
+  const steps = [
     {
-      num: "01",
-      title: "Ingestion & Threat Shield",
-      tag: "Pre-Flight Defense",
-      desc: "Sanitizes multi-format payloads before execution to eliminate security vectors.",
-      mechanics: [
-        "Pre-fetch DNS resolution blocking RFC 1918, RFC 3927, loopback, and metadata IPs (Anti-SSRF).",
-        "Binary magic-byte container validation (\\xFF\\xD8\\xFF, \\x89PNG, ftyp, moov, \\x1A\\x45\\xDF\\xA3).",
-        "Strict quotas: <= 15MB images, <= 60MB videos, duration <= 90s strictly enforced."
-      ]
+      step: "01",
+      title: "Input & Security Shield",
+      desc: "Validates media headers via magic-byte inspection (JPEG, PNG, MP4, WebM) and filters URLs through socket-level DNS resolution to block private IP spaces and internal SSRF attacks."
     },
     {
-      num: "02",
-      title: "Feature & Signal Extraction",
-      tag: "Decomposition",
-      desc: "Parallel extraction pipelines across visual, auditory, and textual dimensions.",
-      mechanics: [
-        "FFmpeg demuxing audio tracks to 16kHz mono linear PCM WAV for Whisper ASR transcription.",
-        "Adaptive Otsu thresholding & Tesseract OCR extracting headline text and video news tickers.",
-        "Error Level Analysis (ELA) at Q=90 JPEG quantization table + Laplacian edge variance (σ²_∇²)."
-      ]
+      step: "02",
+      title: "Signal Decomposition",
+      desc: "Demuxes audio streams to 16kHz PCM WAV for Whisper speech recognition. Runs keyframe OCR and Error Level Analysis (ELA) at Q=90 to identify localized compression anomalies."
     },
     {
-      num: "03",
-      title: "Hybrid Evidence Retrieval",
-      tag: "Dual-Channel",
-      desc: "Bridges local high-speed fact-check indices with live external encyclopedic APIs.",
-      mechanics: [
-        "Local ClaimReview index (sub-10ms fallback) loaded with verified benchmark truth sets.",
-        "Live Wikipedia REST summary and DuckDuckGo journalistic search gateway.",
-        "BM25 lexical term overlap combined with cosine semantic reranking and domain authority weights."
-      ]
+      step: "03",
+      title: "Evidence Retrieval",
+      desc: "Executes lexical BM25 and semantic cosine reranking against offline ClaimReview databases, live Wikipedia summaries, and verified journalistic repositories."
     },
     {
-      num: "04",
-      title: "NLI Stance & Epistemic Calibration",
-      tag: "Decision Layer",
-      desc: "Mathematical calibration preventing overconfidence and hallucinations.",
-      mechanics: [
-        "Natural Language Inference evaluating conditional probabilities across SUPPORTS, REFUTES, NEUTRAL.",
-        "Post-hoc temperature scaling (T = 1.85) reducing Expected Calibration Error from 0.182 to 0.048.",
-        "Temporal decay window (180 days) flagging recycled historical notifications as OUTDATED."
-      ]
+      step: "04",
+      title: "Calibrated Adjudication",
+      desc: "Natural Language Inference classifies evidence stance (Supports, Refutes, Neutral). Temperature scaling (T = 1.85) optimizes calibration, lowering Expected Calibration Error to 0.048."
     }
   ];
 
   return (
-    <section id="pipeline" className="tl-section">
-      <div className="tl-container">
-        <div className="tl-section-header">
-          <span className="tl-tag">// PIPELINE SPECIFICATION</span>
-          <h2 className="tl-title">Multimodal Verification Architecture</h2>
-          <p className="tl-desc">
-            TruthLab operates as an asynchronous pipeline with mathematical logit calibration,
-            cross-modal consistency checks, and multi-tier evidentiary retrieval—rejecting ungrounded AI guesses.
-          </p>
-        </div>
+    <section id="architecture" className="m-section">
+      <div className="m-container">
+        <div className="m-section-label">System Flow</div>
+        <h2 className="m-section-title">Verification Pipeline</h2>
+        <p className="m-section-sub">
+          A four-stage asynchronous pipeline combining signal processing, external evidentiary grounding, and mathematical logit calibration.
+        </p>
 
-        <div className="tl-grid-4">
-          {stages.map((stage) => (
-            <div key={stage.num} className="tl-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="m-grid-4">
+          {steps.map((s) => (
+            <div key={s.step} className="m-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-muted)' }}>
-                    {stage.num}
-                  </span>
-                  <span className="tl-badge">{stage.tag}</span>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-faint)', marginBottom: '16px' }}>
+                  {s.step}
                 </div>
-                <h3 className="tl-card-title" style={{ marginBottom: '8px' }}>{stage.title}</h3>
-                <p className="tl-card-text" style={{ marginBottom: '16px' }}>{stage.desc}</p>
-
-                <ul style={{ listStyle: 'none', borderTop: '1px solid var(--border-hairline)', paddingTop: '14px', margin: 0, paddingLeft: 0 }}>
-                  {stage.mechanics.map((m, idx) => (
-                    <li
-                      key={idx}
-                      style={{
-                        fontSize: '0.76rem',
-                        color: 'var(--text-secondary)',
-                        marginBottom: '8px',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '8px',
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      <span style={{ color: 'var(--status-blue)', fontFamily: 'var(--font-mono)' }}>›</span>
-                      <span>{m}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div
-                style={{
-                  marginTop: '16px',
-                  paddingTop: '12px',
-                  borderTop: '1px solid var(--border-hairline)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.72rem',
-                  color: 'var(--text-muted)',
-                }}
-              >
-                <span>Pipeline Stage</span>
-                <span style={{ color: 'var(--status-green)' }}>Verified ✓</span>
+                <h3 className="m-card-title">{s.title}</h3>
+                <p className="m-card-desc">{s.desc}</p>
               </div>
             </div>
           ))}
