@@ -112,18 +112,23 @@ class OCREngine:
         try:
             with Image.open(path) as img:
                 info = img.info
-                text_chunks = [
-                    str(v).strip() for k, v in info.items()
-                    if isinstance(v, (str, bytes)) and len(str(v).strip()) > 3
-                ]
+                text_chunks = []
+                for k, v in info.items():
+                    val = v.decode("utf-8", errors="ignore") if isinstance(v, bytes) else str(v)
+                    val = val.strip()
+                    # Filter out technical encoding signatures and require meaningful comment/description keys
+                    if len(val) > 5 and not any(sig in val.lower() for sig in ["lavc", "lavf", "ffmpeg", "libx264", "encoder"]):
+                        if any(meta_k in str(k).lower() for meta_k in ["comment", "description", "caption", "title", "text"]):
+                            text_chunks.append(val)
                 if text_chunks:
                     meta_text = " ".join(text_chunks)
                     clean = self.normalize_ocr_text(meta_text)
-                    return {
-                        "text": clean,
-                        "confidence": 0.85,
-                        "regions": [{"text": clean, "confidence": 0.85, "bounding_box": None}],
-                    }
+                    if clean:
+                        return {
+                            "text": clean,
+                            "confidence": 0.85,
+                            "regions": [{"text": clean, "confidence": 0.85, "bounding_box": None}],
+                        }
         except Exception:
             pass
 

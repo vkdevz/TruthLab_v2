@@ -48,6 +48,18 @@ const BENCHMARK_PRESETS: BenchmarkSample[] = [
     modality: "URL",
     payload: "https://en.wikipedia.org/wiki/James_Webb_Space_Telescope",
     expected: "SUPPORTED"
+  },
+  {
+    title: "Image Meme (5G Hoax)",
+    modality: "IMAGE",
+    payload: "/samples/sample_5g_meme.png",
+    expected: "CONTRADICTED"
+  },
+  {
+    title: "Video Clip Sample",
+    modality: "VIDEO",
+    payload: "/samples/sample_news_clip.mp4",
+    expected: "INSUFFICIENT_EVIDENCE"
   }
 ];
 
@@ -90,15 +102,27 @@ export function App() {
     }
   }, [selectedFile]);
 
-  const handlePresetSelect = (preset: BenchmarkSample) => {
+  const handlePresetSelect = async (preset: BenchmarkSample) => {
     setActiveTab(preset.modality);
+    setErrorMsg(null);
     if (preset.modality === 'URL') {
       setInputUrl(preset.payload);
-    } else {
+      setSelectedFile(null);
+    } else if (preset.modality === 'TEXT') {
       setInputText(preset.payload);
+      setSelectedFile(null);
+    } else if (preset.modality === 'IMAGE' || preset.modality === 'VIDEO') {
+      try {
+        const response = await fetch(preset.payload);
+        const blob = await response.blob();
+        const filename = preset.payload.split('/').pop() || 'sample_media';
+        const mimeType = preset.modality === 'IMAGE' ? 'image/png' : 'video/mp4';
+        const file = new File([blob], filename, { type: blob.type || mimeType });
+        setSelectedFile(file);
+      } catch (err) {
+        console.error('Failed to load preset sample media:', err);
+      }
     }
-    setSelectedFile(null);
-    setErrorMsg(null);
   };
 
   const applyVerificationResponse = (data: FullVerificationResponse) => {
