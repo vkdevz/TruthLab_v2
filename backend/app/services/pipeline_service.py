@@ -47,8 +47,9 @@ class PipelineService:
     TEXT / URL / IMAGE / VIDEO -> CLAIM -> EVIDENCE -> TEMPORAL -> MEDIA -> FUSION -> EXPLANATION
     """
 
-    async def verify_text(self, text: str) -> FullVerificationResponse:
-        job_id = await job_manager.create_job(input_modality="TEXT", input_summary=text[:200])
+    async def verify_text(self, text: str, job_id: Optional[str] = None) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="TEXT", input_summary=text[:200])
         try:
             await job_manager.update_progress(job_id, stage="INGESTING", percent=10)
             cleaned_text = text_ingestion_service.ingest_text(text)
@@ -59,17 +60,27 @@ class PipelineService:
                 content_text=cleaned_text,
                 source_meta={"type": "raw_text"}
             )
-        except HTTPException:
+        except HTTPException as exc:
+            await job_manager.fail_job(job_id, error_message=str(exc.detail if hasattr(exc, "detail") else exc))
             raise
         except Exception as exc:
             await job_manager.fail_job(job_id, error_message=str(exc))
             raise HTTPException(status_code=500, detail=f"Pipeline verification failure: {str(exc)}")
 
-    async def verify_url(self, url: str) -> FullVerificationResponse:
-        job_id = await job_manager.create_job(input_modality="URL", input_summary=url)
+    async def verify_url(
+        self,
+        url: str,
+        job_id: Optional[str] = None,
+        preloaded_article: Optional[dict] = None
+    ) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="URL", input_summary=url)
         try:
             await job_manager.update_progress(job_id, stage="FETCHING_URL", percent=10)
-            article_data = await url_ingestion_service.ingest_url(url)
+            if preloaded_article:
+                article_data = preloaded_article
+            else:
+                article_data = await url_ingestion_service.ingest_url(url)
             article_text = article_data["text"]
 
             return await self._execute_verification_pipeline(
@@ -78,16 +89,28 @@ class PipelineService:
                 content_text=article_text,
                 source_meta=article_data
             )
-        except HTTPException:
+        except HTTPException as exc:
+            await job_manager.fail_job(job_id, error_message=str(exc.detail if hasattr(exc, "detail") else exc))
             raise
         except Exception as exc:
             await job_manager.fail_job(job_id, error_message=str(exc))
             raise HTTPException(status_code=500, detail=f"Pipeline URL verification failure: {str(exc)}")
 
-    async def verify_image(self, file: UploadFile) -> FullVerificationResponse:
-        job_id = await job_manager.create_job(input_modality="IMAGE", input_summary=file.filename or "image_upload")
+    async def verify_image(self, file: UploadFile, job_id: Optional[str] = None) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="IMAGE", input_summary=file.filename or "image_upload")
         saved_path = await storage_service.save_upload_file(file, is_video=False)
+        return await self.verify_image_path(saved_path, filename=file.filename or "image_upload", job_id=job_id, cleanup=True)
 
+    async def verify_image_path(
+        self,
+        saved_path: Path,
+        filename: str = "image_upload",
+        job_id: Optional[str] = None,
+        cleanup: bool = True
+    ) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="IMAGE", input_summary=filename)
         try:
             await job_manager.update_progress(job_id, stage="ANALYZING_IMAGE", percent=15)
 
@@ -149,7 +172,7 @@ class PipelineService:
                 job_id=job_id,
                 modality=ModalityType.IMAGE,
                 content_text=ocr_text,
-                source_meta={"filename": file.filename, "ocr_confidence": ocr_res.get("confidence")},
+                source_meta={"filename": filename, "ocr_confidence": ocr_res.get("confidence")},
                 image_forensics=image_forensics,
                 ocr_text=ocr_text,
             )
@@ -161,11 +184,24 @@ class PipelineService:
             await job_manager.fail_job(job_id, error_message=str(exc))
             raise HTTPException(status_code=500, detail=f"Image verification failure: {str(exc)}")
         finally:
-            storage_service.cleanup_file(saved_path)
+            if cleanup:
+                storage_service.cleanup_file(saved_path)
 
-    async def verify_video(self, file: UploadFile) -> FullVerificationResponse:
-        job_id = await job_manager.create_job(input_modality="VIDEO", input_summary=file.filename or "video_upload")
+    async def verify_video(self, file: UploadFile, job_id: Optional[str] = None) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="VIDEO", input_summary=file.filename or "video_upload")
         saved_path = await storage_service.save_upload_file(file, is_video=True)
+        return await self.verify_video_path(saved_path, filename=file.filename or "video_upload", job_id=job_id, cleanup=True)
+
+    async def verify_video_path(
+        self,
+        saved_path: Path,
+        filename: str = "video_upload",
+        job_id: Optional[str] = None,
+        cleanup: bool = True
+    ) -> FullVerificationResponse:
+        if not job_id:
+            job_id = await job_manager.create_job(input_modality="VIDEO", input_summary=filename)
         scratch_dir = Path(tempfile.mkdtemp(prefix="video_pipe_"))
 
         try:
@@ -260,7 +296,7 @@ class PipelineService:
                 modality=ModalityType.VIDEO,
                 content_text=combined_corpus,
                 source_meta={
-                    "filename": file.filename,
+                    "filename": filename,
                     "duration": video_forensics.duration_seconds,
                     "extracted_scenes": video_forensics.extracted_scenes,
                     "transcript": transcript,
@@ -276,7 +312,8 @@ class PipelineService:
             await job_manager.fail_job(job_id, error_message=str(exc))
             raise HTTPException(status_code=500, detail=f"Video verification failure: {str(exc)}")
         finally:
-            storage_service.cleanup_file(saved_path)
+            if cleanup:
+                storage_service.cleanup_file(saved_path)
             shutil.rmtree(scratch_dir, ignore_errors=True)
 
     async def _execute_verification_pipeline(
@@ -471,15 +508,28 @@ class PipelineService:
 
         # Precedence: CONTRADICTED > OUTDATED > MISLEADING > SUPPORTED > INSUFFICIENT_EVIDENCE
         if contradicted_count > 0:
-            return VeracityLabel.CONTRADICTED, min(0.96, avg_conf)
+            target_confs = [r.confidence for r in results if r.veracity == VeracityLabel.CONTRADICTED]
+            decisive_conf = sum(target_confs) / len(target_confs)
+            return VeracityLabel.CONTRADICTED, round(min(0.96, decisive_conf), 3)
         if outdated_count > 0:
-            return VeracityLabel.OUTDATED, min(0.95, avg_conf)
+            target_confs = [r.confidence for r in results if r.veracity == VeracityLabel.OUTDATED]
+            decisive_conf = sum(target_confs) / len(target_confs)
+            return VeracityLabel.OUTDATED, round(min(0.95, decisive_conf), 3)
         if misleading_count > 0:
-            return VeracityLabel.MISLEADING, min(0.90, avg_conf)
+            target_confs = [r.confidence for r in results if r.veracity == VeracityLabel.MISLEADING]
+            decisive_conf = sum(target_confs) / len(target_confs)
+            return VeracityLabel.MISLEADING, round(min(0.90, decisive_conf), 3)
         if supported_count > 0 and contradicted_count == 0:
             # Corroborated propositions without refutations
-            calibrated_conf = avg_conf if insufficient_count == 0 else max(0.65, avg_conf * 0.92)
-            return VeracityLabel.SUPPORTED, round(calibrated_conf, 3)
+            # Require supported propositions to constitute at least half of the evaluated claims
+            if supported_count >= insufficient_count:
+                target_confs = [r.confidence for r in results if r.veracity == VeracityLabel.SUPPORTED]
+                decisive_conf = sum(target_confs) / len(target_confs)
+                calibrated_conf = decisive_conf if insufficient_count == 0 else max(0.65, decisive_conf * 0.92)
+                return VeracityLabel.SUPPORTED, round(calibrated_conf, 3)
+            else:
+                # Unproven claims dominate; withhold overall SUPPORTED verdict
+                return VeracityLabel.INSUFFICIENT_EVIDENCE, round(min(0.52, max(0.35, avg_conf)), 3)
         if all(v == VeracityLabel.INSUFFICIENT_EVIDENCE for v in verdicts):
             return VeracityLabel.INSUFFICIENT_EVIDENCE, 0.45
 
@@ -505,7 +555,10 @@ class PipelineService:
         if overall_veracity == VeracityLabel.CONTRADICTED:
             summary = f"{prefix}Material contradictions were identified across {contradicted_count} of {total} evaluated claim(s) by authoritative fact-checks and independent reporting."
         elif overall_veracity == VeracityLabel.SUPPORTED:
-            summary = f"{prefix}All {total} factual proposition(s) are corroborated by credible reporting and official documentation."
+            if supported_count == total:
+                summary = f"{prefix}All {total} factual proposition(s) are corroborated by credible reporting and official documentation."
+            else:
+                summary = f"{prefix}{supported_count} of {total} evaluated claim(s) are corroborated by credible reporting, with {insufficient_count} statement(s) having insufficient corroborating evidence."
         elif overall_veracity == VeracityLabel.OUTDATED:
             summary = f"{prefix}The content recirculates historical events or obsolete announcements presented out of their original temporal context."
         elif overall_veracity == VeracityLabel.MISLEADING:

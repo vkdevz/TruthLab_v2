@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-12T13:40:19.437876+00:00",
+    "timestamp_utc": "2026-11-10T09:13:01.466236+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "032af78fab156dc0b99cfd7d05d997a51b8a206f",
+      "commit": "c8197f424223b38fc67168e1e58d3c04937ceedd",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0058,
+  "elapsed_seconds": 0.0048,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Evaluation of multimodal intelligence and cross-modal alignment on verified multimodal claims",
@@ -74,7 +74,7 @@
       "text+video": 9
     },
     "cross_modal_alignment": {
-      "mean_alignment_score": 0.7579,
+      "mean_alignment_score": 0.6789,
       "median_alignment_score": 1.0,
       "min_alignment_score": 0.05,
       "max_alignment_score": 1.0,
@@ -100,10 +100,11 @@
       {
         "id": "claim_ins_011",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {
@@ -155,19 +156,21 @@
       {
         "id": "claim_con_012",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {
         "id": "claim_ins_006",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {
@@ -182,10 +185,11 @@
       {
         "id": "claim_out_012",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {
@@ -227,10 +231,11 @@
       {
         "id": "claim_con_007",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {
@@ -243,10 +248,11 @@
       {
         "id": "claim_out_004",
         "modality": "text+video",
-        "alignment_score": 0.55,
+        "alignment_score": 0.3,
         "is_manipulated_or_cheapfake": true,
         "notes": [
-          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image."
+          "Cross-modal disparity: textual claim differs significantly from the visual text displayed inside the image.",
+          "Elevated synthetic face probability in video reduces cross-modal evidentiary reliability."
         ]
       },
       {

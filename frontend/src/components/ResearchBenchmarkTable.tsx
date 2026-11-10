@@ -38,7 +38,7 @@ export const ResearchBenchmarkTable: React.FC = () => {
         <div className="m-section-label">Empirical Evaluation</div>
         <h2 className="m-section-title">Benchmark Results</h2>
         <p className="m-section-sub">
-          Cross-validated across 15 structured experiments with McNemar statistical significance testing (p = 0.031 &lt; 0.05).
+          Evaluated across 15 structured experiments with McNemar exact testing and 1,000-sample bootstrap validation.
         </p>
 
         {/* Desktop View: Full Comparative Table */}
@@ -122,13 +122,13 @@ export const ResearchBenchmarkTable: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
           <div className="m-card">
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-              Significance (McNemar)
+              Bootstrap Delta (1k)
             </div>
             <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              p = 0.031 (&lt; 0.05)
+              +0.250 F1 Mean
             </div>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              Multimodal fusion yields statistically significant improvement over text-only baselines.
+              Non-parametric resampling demonstrates consistent positive directional gain over baseline.
             </p>
           </div>
 
@@ -149,7 +149,7 @@ export const ResearchBenchmarkTable: React.FC = () => {
               Regression Suite
             </div>
             <div style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              121 / 121 Passing
+              137 / 137 Passing
             </div>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
               Full unit, forensic, and security test coverage executing in 33 seconds.

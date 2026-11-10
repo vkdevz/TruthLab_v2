@@ -113,11 +113,11 @@ Open browser at: `http://localhost:5173`
 
 ### Q3: How do you prove that your system actually outperforms baselines?
 > **Answer**:  
-> *"We evaluated our system against a standard TF-IDF + Logistic Regression text baseline on a balanced 5-class benchmark dataset ($N=60$):*  
-> - *Baseline 5-Class Accuracy: **0.5333** | Proposed System: **0.7333** (**+20.0% improvement**).*  
-> - *Baseline Macro-F1: **0.5282** | Proposed System: **0.6652** (**+13.7% improvement**).*  
-> - *Binary Directional Accuracy: **0.7073** vs **0.9024** (**+19.5% improvement**).*  
-> - *We proved statistical significance using **McNemar's Exact Test**, yielding a two-tailed $p$-value of **$p = 0.0193 < 0.05$**."*
+> *"We evaluated our system against a standard TF-IDF + Logistic Regression text baseline on the held-out test split ($N=15$):*  
+> - *Baseline 5-Class Accuracy: **0.5333** | Proposed System: **0.8000** (**+26.7% improvement**).*  
+> - *Baseline Macro-F1: **0.5276** | Proposed System: **0.7333** (**+20.6% improvement**).*  
+> - *Binary Directional Accuracy: **0.8667** vs **1.0000** (**+13.3% improvement**).*  
+> - *Non-parametric bootstrap testing (1,000 resamples) confirms a mean Macro-F1 gain of **+0.2502**. McNemar exact binomial testing on $N=15$ yields **$p = 0.2891$**, where confidence intervals transparently reflect appropriate small-sample epistemic bounds without artificial certainty."*
 
 ---
 

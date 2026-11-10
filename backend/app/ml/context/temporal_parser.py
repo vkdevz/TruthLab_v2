@@ -19,26 +19,25 @@ class TemporalParser:
         return any(marker in lower for marker in PRESENT_URGENCY_MARKERS)
 
     def parse_text_timestamp(self, text: str) -> tuple[str | None, datetime | None]:
-        lower = text.lower()
-        
-        # Check year first
-        years = self.year_pattern.findall(text)
-        if years:
-            year_str = years[0]
-            parsed = dateparser.parse(f"01/01/{year_str}")
-            if parsed:
-                return year_str, parsed.replace(tzinfo=timezone.utc)
-
-        # Check relative or explicit date phrases
+        # Check relative or explicit date phrases with actual English month names FIRST
         date_candidates = re.findall(
-            r"\b(?:on\s+)?([A-Z][a-z]+\s+\d{1,2}(?:,\s+\d{4})?)\b",
-            text
+            r"\b(?:on\s+)?((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s+\d{4})?)\b",
+            text,
+            flags=re.IGNORECASE,
         )
         if date_candidates:
             phrase = date_candidates[0]
             parsed = dateparser.parse(phrase)
             if parsed:
                 return phrase, parsed.replace(tzinfo=timezone.utc)
+
+        # Fall back to 4-digit standalone year only if no specific date phrase matched
+        years = self.year_pattern.findall(text)
+        if years:
+            year_str = years[0]
+            parsed = dateparser.parse(f"01/01/{year_str}")
+            if parsed:
+                return year_str, parsed.replace(tzinfo=timezone.utc)
 
         return None, None
 

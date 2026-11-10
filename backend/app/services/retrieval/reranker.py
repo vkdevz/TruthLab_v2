@@ -1,53 +1,18 @@
-import math
-from sklearn.feature_extraction.text import TfidfVectorizer
 from backend.app.schemas.evidence import EvidenceSnippet
+from backend.app.evidence.ranking import hybrid_evidence_ranker, HybridEvidenceRanker
 
 
 class EvidenceReranker:
-    """Reranks retrieved evidence passages according to semantic relevance with the target claim."""
+    """Reranks retrieved evidence passages according to semantic relevance with the target claim.
+    Delegates to canonical HybridEvidenceRanker to maintain a single source of truth."""
+
+    def __init__(self, ranker: HybridEvidenceRanker | None = None):
+        self._ranker = ranker or hybrid_evidence_ranker
 
     def rerank(self, claim_text: str, evidence_items: list[EvidenceSnippet]) -> list[EvidenceSnippet]:
         if not evidence_items:
             return []
-
-        docs = [claim_text] + [item.snippet_text for item in evidence_items]
-        
-        try:
-            vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english")
-            tfidf_matrix = vectorizer.fit_transform(docs)
-            claim_vec = tfidf_matrix[0]
-
-            for i, item in enumerate(evidence_items):
-                snippet_vec = tfidf_matrix[i + 1]
-                # Cosine similarity
-                dot = (claim_vec * snippet_vec.T).toarray()[0][0]
-                norm_c = math.sqrt((claim_vec * claim_vec.T).toarray()[0][0])
-                norm_s = math.sqrt((snippet_vec * snippet_vec.T).toarray()[0][0])
-                
-                sim = dot / (norm_c * norm_s) if (norm_c * norm_s) > 0 else 0.05
-                
-                # Boost verified expert fact-checks ONLY when semantically relevant
-                if item.is_claim_review:
-                    # Verified ClaimReview matched by fact-check index: retain its authoritative score
-                    sim = max(item.retrieval_score, sim * 1.35)
-                else:
-                    if sim >= 0.10:
-                        sim = min(1.0, max(sim, item.retrieval_score * 0.85))
-                    else:
-                        sim = min(sim, 0.05)
-                
-                item.retrieval_score = round(max(0.01, min(1.0, float(sim))), 3)
-
-        except Exception:
-            # Fallback to existing retrieval scores
-            pass
-
-        # Sort descending by retrieval score * domain weight
-        evidence_items.sort(
-            key=lambda x: x.retrieval_score * x.domain_credibility_weight,
-            reverse=True
-        )
-        return evidence_items
+        return self._ranker.rank_evidence(claim_text, evidence_items, top_k=len(evidence_items))
 
 
 evidence_reranker = EvidenceReranker()

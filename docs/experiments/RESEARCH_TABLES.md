@@ -57,15 +57,15 @@ All metrics compiled deterministically from machine-readable experiment results 
 
 | Perturbation Mode | Accuracy | Macro-F1 | Stability Ratio | F1 Delta (Δ) |
 | --- | --- | --- | --- | --- |
-| Clean Baseline | 0.4 | 0.28 | 1.0 | 0.0 |
-| Spelling Noise | 0.4 | 0.28 | 1.0 | 0.0 |
-| Punctuation Distortion | 0.4 | 0.28 | 1.0 | 0.0 |
-| Capitalization Distortion | 0.4 | 0.28 | 1.0 | 0.0 |
-| Noisy Ocr Simulation | 0.4 | 0.28 | 1.0 | 0.0 |
-| Partial Truncation 50Pct | 0.4 | 0.28 | 1.0 | 0.0 |
-| Missing Evidence Zero Retrieval | 0.2 | 0.0667 | 0.2 | -0.2133 |
-| Conflicting Evidence Injected | 0.4 | 0.28 | 1.0 | 0.0 |
-| Reordered Evidence Shuffled | 0.4 | 0.28 | 1.0 | 0.0 |
+| Clean Baseline | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Spelling Noise | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Punctuation Distortion | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Capitalization Distortion | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Noisy Ocr Simulation | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Partial Truncation 50Pct | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Missing Evidence Zero Retrieval | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Conflicting Evidence Injected | 0.2 | 0.0667 | 1.0 | 0.0 |
+| Reordered Evidence Shuffled | 0.2 | 0.0667 | 1.0 | 0.0 |
 
 
 ## Table 6: Multimodal Intelligence & Cross-Modal Alignment

@@ -52,7 +52,12 @@ async def analyze_image(file: UploadFile = File(...)):
                 raw_ev = await web_retriever.retrieve_evidence(c.id, c.canonical_claim, c.search_queries)
                 reranked_ev = evidence_reranker.rerank(c.canonical_claim, raw_ev)
                 stanced_ev = stance_classifier.evaluate_evidence_stances(c.canonical_claim, reranked_ev)
-                result = veracity_scorer.score_claim(c, stanced_ev)
+                result = veracity_scorer.score_claim(
+                    claim=c,
+                    evidence_items=stanced_ev,
+                    image_forensics=forensic_indicators,
+                    ocr_text=ocr_text,
+                )
                 verified_claims.append(result)
 
         # 5. Formulate summary

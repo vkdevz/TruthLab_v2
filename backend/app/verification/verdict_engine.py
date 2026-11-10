@@ -94,10 +94,15 @@ class FiveClassVerdictEngine:
                     "System withholds binary truth judgment to avoid ungrounded speculation.",
                 ],
             )
+            # Calibrate confidence dynamically based on evidentiary deficit
+            calibrated_insufficient_conf = round(
+                max(0.30, min(0.48, 0.30 + 0.15 * (sufficiency_score / max(0.01, settings.EVIDENCE_SUFFICIENCY_THRESHOLD)))),
+                3
+            )
             return ClaimVerificationResult(
                 claim=claim,
                 veracity=VeracityLabel.INSUFFICIENT_EVIDENCE,
-                confidence=0.45,
+                confidence=calibrated_insufficient_conf,
                 evidence_sufficiency_score=round(sufficiency_score, 3),
                 is_temporal_mismatch=temporal_res.is_outdated or temporal_res.is_anachronistic,
                 evidence_items=evidence_items,
@@ -107,6 +112,7 @@ class FiveClassVerdictEngine:
         # Aggregate Stance Weights
         total_support = 0.0
         total_refute = 0.0
+        total_neutral = 0.0
         support_citations = []
         refute_citations = []
 
@@ -114,18 +120,49 @@ class FiveClassVerdictEngine:
             eff_weight = ev.retrieval_score * ev.domain_credibility_weight
             p_sup = ev.stance_probabilities.get("SUPPORTS", 0.0)
             p_ref = ev.stance_probabilities.get("REFUTES", 0.0)
+            p_neu = ev.stance_probabilities.get("NEUTRAL", 0.0)
 
             total_support += eff_weight * p_sup
             total_refute += eff_weight * p_ref
+            total_neutral += eff_weight * p_neu
 
             if ev.stance == StanceType.SUPPORTS:
                 support_citations.append(ev.source_url)
             elif ev.stance == StanceType.REFUTES:
                 refute_citations.append(ev.source_url)
 
-        total_weight = total_support + total_refute + 1e-6
-        support_ratio = total_support / total_weight
-        refute_ratio = total_refute / total_weight
+        total_evidence_weight = total_support + total_refute + total_neutral + 1e-6
+        stance_mass = total_support + total_refute
+        support_ratio = total_support / (stance_mass + 1e-6)
+        refute_ratio = total_refute / (stance_mass + 1e-6)
+        active_evidence_ratio = stance_mass / total_evidence_weight
+
+        # Gate: If evidence is overwhelmingly neutral or lacks polarized stance mass
+        if active_evidence_ratio < 0.25 or (total_support < 0.35 and total_refute < 0.35):
+            calibrated_insufficient_conf = round(
+                max(0.30, min(0.48, 0.30 + 0.15 * (sufficiency_score / max(0.01, settings.EVIDENCE_SUFFICIENCY_THRESHOLD)))),
+                3
+            )
+            audit = AuditTrail(
+                summary="Retrieved evidence passages are neutral or non-committal, lacking sufficient stance polarity to verify or refute this claim.",
+                supporting_citations=[],
+                refuting_citations=[],
+                temporal_notes=temporal_res.temporal_notes,
+                media_authenticity_notes=[],
+                limitations=[
+                    "Retrieved documents provide background context but do not directly confirm or deny the assertion.",
+                    "System withholds binary truth judgment to avoid ungrounded speculation.",
+                ],
+            )
+            return ClaimVerificationResult(
+                claim=claim,
+                veracity=VeracityLabel.INSUFFICIENT_EVIDENCE,
+                confidence=calibrated_insufficient_conf,
+                evidence_sufficiency_score=round(sufficiency_score, 3),
+                is_temporal_mismatch=temporal_res.is_outdated or temporal_res.is_anachronistic,
+                evidence_items=evidence_items,
+                audit=audit,
+            )
 
         is_explicitly_outdated = any(
             "outdated" in (ev.claim_review_rating or "").lower()
@@ -135,7 +172,7 @@ class FiveClassVerdictEngine:
         # Precedence Rule A: OUTDATED (Historical expired notice or recycled true event)
         if is_explicitly_outdated or (temporal_res.is_outdated and support_ratio >= 0.40):
             veracity = VeracityLabel.OUTDATED
-            confidence = 0.90
+            confidence = round(min(0.95, max(0.85, 0.80 + 0.15 * support_ratio)), 3)
             summary = (
                 f"The claim '{claim.canonical_claim}' references a historical event or expired notice "
                 f"({temporal_res.evidence_date.strftime('%Y-%m-%d') if temporal_res.evidence_date else 'in the past'}), "
@@ -143,7 +180,7 @@ class FiveClassVerdictEngine:
             )
 
         # Precedence Rule B: CONTRADICTED (Authoritative evidence directly refutes the claim)
-        elif refute_ratio >= 0.60:
+        elif refute_ratio >= 0.60 and total_refute >= 0.35:
             veracity = VeracityLabel.CONTRADICTED
             confidence = round(min(0.96, 0.65 + 0.30 * refute_ratio), 3)
             summary = (
@@ -154,11 +191,11 @@ class FiveClassVerdictEngine:
         # Precedence Rule C: MISLEADING (Geographic mismatch, cherry-picking, or conflicting evidence)
         elif temporal_res.location_match_status == "MISMATCH":
             veracity = VeracityLabel.MISLEADING
-            confidence = 0.82
+            confidence = round(min(0.92, max(0.78, 0.75 + 0.15 * (1.0 - abs(support_ratio - refute_ratio)))), 3)
             summary = f"The claim '{claim.canonical_claim}' is misleading due to geographic recontextualization."
 
         # Precedence Rule D: SUPPORTED (Sufficient corroboration, contemporaneous, authentic)
-        elif support_ratio >= 0.65:
+        elif support_ratio >= 0.65 and total_support >= 0.35:
             veracity = VeracityLabel.SUPPORTED
             confidence = round(min(0.96, 0.65 + 0.30 * support_ratio), 3)
             summary = (
@@ -167,13 +204,17 @@ class FiveClassVerdictEngine:
             )
 
         # Precedence Rule E: MISLEADING (Inconclusive / contradictory balance)
-        else:
+        elif (total_support >= 0.25 and total_refute >= 0.25) or (len(support_citations) > 0 and len(refute_citations) > 0):
             veracity = VeracityLabel.MISLEADING
-            confidence = 0.72
+            confidence = round(min(0.85, max(0.65, 0.60 + 0.20 * (1.0 - abs(support_ratio - refute_ratio)))), 3)
             summary = (
                 f"The claim '{claim.canonical_claim}' presents conflicting or selective evidence: "
                 f"supported by some reports while contested by others."
             )
+        else:
+            veracity = VeracityLabel.INSUFFICIENT_EVIDENCE
+            confidence = 0.45
+            summary = f"The claim '{claim.canonical_claim}' lacks sufficient conclusive corroborating or refuting evidence."
 
         audit = AuditTrail(
             summary=summary,

@@ -102,18 +102,23 @@ class TemporalVerifier:
 
         elif claim_date:
             if effective_event_date:
-                delta_days = abs((claim_date - effective_event_date).days)
-                if delta_days > settings.TEMPORAL_OUTDATED_DAYS:
-                    is_anachronistic = True
-                    temporal_status = "OUTDATED"
-                    reason = (
-                        f"Timeline mismatch: claim specifies {claim_date.strftime('%Y-%m-%d')}, "
-                        f"whereas verified records place the event on {effective_event_date.strftime('%Y-%m-%d')} (delta: {delta_days} days)."
-                    )
-                    notes.append(reason)
-                else:
+                is_year_only = bool(claim_anchor and claim_anchor.isdigit() and len(claim_anchor) == 4)
+                if is_year_only and claim_date.year == effective_event_date.year:
                     temporal_status = "HISTORICAL" if claim_date.year < now.year else "CURRENT"
-                    reason = f"Explicit date {claim_date.strftime('%Y-%m-%d')} aligns with historical records."
+                    reason = f"Explicit year {claim_anchor} aligns with historical event year ({effective_event_date.year})."
+                else:
+                    delta_days = abs((claim_date - effective_event_date).days)
+                    if delta_days > settings.TEMPORAL_OUTDATED_DAYS:
+                        is_anachronistic = True
+                        temporal_status = "OUTDATED"
+                        reason = (
+                            f"Timeline mismatch: claim specifies {claim_date.strftime('%Y-%m-%d')}, "
+                            f"whereas verified records place the event on {effective_event_date.strftime('%Y-%m-%d')} (delta: {delta_days} days)."
+                        )
+                        notes.append(reason)
+                    else:
+                        temporal_status = "HISTORICAL" if claim_date.year < now.year else "CURRENT"
+                        reason = f"Explicit date {claim_date.strftime('%Y-%m-%d')} aligns with historical records."
             else:
                 temporal_status = "HISTORICAL" if claim_date.year < now.year else "CURRENT"
                 reason = f"Claim references explicit date ({claim_date.strftime('%Y-%m-%d')})."

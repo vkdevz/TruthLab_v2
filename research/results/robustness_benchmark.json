@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-12T13:40:25.311158+00:00",
+    "timestamp_utc": "2026-11-10T09:13:05.263988+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "032af78fab156dc0b99cfd7d05d997a51b8a206f",
+      "commit": "c8197f424223b38fc67168e1e58d3c04937ceedd",
       "branch": "main",
       "dirty": true
     },
@@ -64,69 +64,69 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 0.0109,
+  "elapsed_seconds": 0.0112,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "description": "Systematic robustness evaluation across 8 perturbation modes",
     "sample_count": 15,
     "perturbation_evaluations": {
       "clean_baseline": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "spelling_noise": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "punctuation_distortion": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "capitalization_distortion": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "noisy_ocr_simulation": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "partial_truncation_50pct": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "missing_evidence_zero_retrieval": {
         "accuracy": 0.2,
         "macro_f1": 0.0667,
-        "stability_ratio": 0.2,
-        "f1_delta": -0.2133
+        "stability_ratio": 1.0,
+        "f1_delta": 0.0
       },
       "conflicting_evidence_injected": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       },
       "reordered_evidence_shuffled": {
-        "accuracy": 0.4,
-        "macro_f1": 0.28,
+        "accuracy": 0.2,
+        "macro_f1": 0.0667,
         "stability_ratio": 1.0,
         "f1_delta": 0.0
       }
     },
     "robustness_summary": {
-      "mean_stability_across_perturbations": 0.9,
+      "mean_stability_across_perturbations": 1.0,
       "permutation_invariance_maintained": true,
       "documented_vulnerabilities": [
         "Severe transcript truncation drops context needed for claim extraction.",

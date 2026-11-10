@@ -33,6 +33,6 @@
 - **Modality**: `text`
 - **Gold Verdict**: `OUTDATED` | **Predicted**: `CONTRADICTED`
 - **Confidence**: 0.934 (Uncertainty: `LOW`)
-- **Root Cause**: Temporal verifier assigned status 'OUTDATED' rather than recognizing historical event recycling.
+- **Root Cause**: Temporal verifier assigned status 'CURRENT' rather than recognizing historical event recycling.
 - **Remediation**: Enhance temporal anchor extraction for relative temporal phrases and expand historical event knowledge graphs.
 

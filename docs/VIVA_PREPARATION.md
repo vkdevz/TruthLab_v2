@@ -77,8 +77,8 @@ Coupling them into a single step conflates topical relevance with logical truth.
 - **Evidence-Aware System**: 5-class Accuracy: **0.7333**, Macro-F1: **0.6652**, Binary Directional Accuracy: **0.9024**.
 - **Improvements**: $+0.2000$ accuracy ($+20\%$), $+0.1370$ Macro-F1, $+0.1951$ binary accuracy ($90.2\%$ vs $70.7\%$).
 
-### Q13: Did you prove statistical significance?
-**Answer**: Yes. Using paired contingency tables and **McNemar's Exact Test**, our system achieved a test statistic of $6.5455$ with a two-tailed $p$-value of **$p = 0.0193 < 0.05$**. Bootstrap 95% confidence intervals confirmed non-overlapping mean trajectories ($[0.6167, 0.8333]$ for our system vs $[0.4167, 0.6500]$ for baseline).
+### Q13: Did you analyze statistical significance and sample-size bounds?
+**Answer**: Yes. We computed non-parametric bootstrap confidence intervals (1,000 resamples) and exact paired testing. On the held-out test split ($N=15$), our system achieved a mean Macro-F1 improvement of $+0.2502$ ($0.7289$ for our system vs $0.4787$ for baseline). While paired exact McNemar testing on $N=15$ yielded a conservative $p = 0.2891$ due to sample size constraints, the direction of improvement is consistent. In keeping with scientific integrity, we transparently disclose these sample-size boundaries rather than claiming artificial statistical certainty.
 
 ### Q14: How did you evaluate evidence retrieval independently?
 **Answer**: On $N=48$ annotated ground-truth test claims:
@@ -143,4 +143,4 @@ Our defenses in `URLValidator`:
 > 
 > Unlike existing tools that perform closed-book binary classification based on superficial text style, our system implements an end-to-end evidence-grounded architecture. It accepts text, URLs, images, or video, extracts check-worthy atomic claims, and retrieves corroborated evidence from indexed ClaimReview and web sources. It pairs this retrieval with NLI stance interpretation, temporal reasoning to detect recycled historical claims, auxiliary media forensics, and calibrated uncertainty estimation.
 > 
-> Empirically, our pipeline achieves an overall 5-class accuracy of 73.3% and binary accuracy of 90.2%, representing a statistically significant +19.5% improvement over baseline classifiers (p = 0.0193). It is fully implemented with a hardened FastAPI backend, an interactive React workbench, 121 automated tests, and reproducible benchmarks. I welcome your questions."*
+> Empirically, our pipeline achieves an overall 5-class accuracy of 80.0% and binary directional accuracy of 100% on the held-out test split, achieving a +0.2502 mean Macro-F1 boost over text baseline classifiers (exact McNemar p = 0.2891, bootstrap delta 95% CI [-0.0614, 0.5794]). It is fully implemented with a hardened FastAPI backend, an interactive React workbench, 137+ automated tests, and reproducible benchmarks. I welcome your questions."*

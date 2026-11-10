@@ -62,9 +62,7 @@ def create_synthetic_test_images(temp_dir: Path) -> Dict[str, Path]:
 
     # 4. Stripped image (no EXIF metadata)
     stripped_path = temp_dir / "stripped_clean.jpg"
-    data = list(img_pristine.getdata())
-    clean_no_exif = Image.new(img_pristine.mode, img_pristine.size)
-    clean_no_exif.putdata(data)
+    clean_no_exif = Image.fromarray(np.array(img_pristine))
     clean_no_exif.save(stripped_path, format="JPEG", quality=90)
 
     return {

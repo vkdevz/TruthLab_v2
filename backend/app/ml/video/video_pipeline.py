@@ -56,18 +56,7 @@ class VideoVerificationPipeline:
                 else "No spoken dialogue or legible text overlays extracted from video."
             )
 
-            # 5. Extract and verify claims
-            verified_claims: list[ClaimVerificationResult] = []
-            if corpus_parts:
-                claims = claim_decomposer.decompose(combined_corpus)
-                for c in claims:
-                    raw_ev = await web_retriever.retrieve_evidence(c.id, c.canonical_claim, c.search_queries)
-                    reranked_ev = evidence_reranker.rerank(c.canonical_claim, raw_ev)
-                    stanced_ev = stance_classifier.evaluate_evidence_stances(c.canonical_claim, reranked_ev)
-                    result = veracity_scorer.score_claim(c, stanced_ev)
-                    verified_claims.append(result)
-
-            # 6. Aggregate visual manipulation heuristics across keyframes
+            # 5. Aggregate visual manipulation heuristics across keyframes
             avg_synth = 0.15
             if frame_findings:
                 synth_scores = [f["synthetic_probability"] for f in frame_findings]
@@ -84,6 +73,22 @@ class VideoVerificationPipeline:
                 inconsistent_frame_rate=False,
                 synthetic_face_probability=avg_synth,
             )
+
+            # 6. Extract and verify claims with multimodal fusion
+            verified_claims: list[ClaimVerificationResult] = []
+            if corpus_parts:
+                claims = claim_decomposer.decompose(combined_corpus)
+                for c in claims:
+                    raw_ev = await web_retriever.retrieve_evidence(c.id, c.canonical_claim, c.search_queries)
+                    reranked_ev = evidence_reranker.rerank(c.canonical_claim, raw_ev)
+                    stanced_ev = stance_classifier.evaluate_evidence_stances(c.canonical_claim, reranked_ev)
+                    result = veracity_scorer.score_claim(
+                        claim=c,
+                        evidence_items=stanced_ev,
+                        video_forensics=forensics,
+                        ocr_text=overlay_ocr,
+                    )
+                    verified_claims.append(result)
 
             assessment = (
                 f"Video analysis extracted {len(frames)} representative scene keyframe(s), "

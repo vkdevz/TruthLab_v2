@@ -33,23 +33,10 @@ class NLIEvidenceInterpreter:
             stance = StanceType.SUPPORTS
             probs = {"SUPPORTS": 0.88, "REFUTES": 0.05, "NEUTRAL": 0.07}
         else:
-            # Token overlap evaluation using content words only
-            from backend.app.evidence.provider import STOP_WORDS
-            c_content = {w for w in re.findall(r"\w+", c_lower) if w not in STOP_WORDS and len(w) > 2}
-            s_content = {w for w in re.findall(r"\w+", s_lower) if w not in STOP_WORDS and len(w) > 2}
-            overlap = len(c_content.intersection(s_content))
-            union = c_content.union(s_content)
-            jaccard = overlap / len(union) if union else 0.0
-
-            if overlap >= 3 and jaccard >= 0.18:
-                stance = StanceType.SUPPORTS
-                probs = {"SUPPORTS": 0.80, "REFUTES": 0.08, "NEUTRAL": 0.12}
-            elif overlap >= 2 and jaccard >= 0.12:
-                stance = StanceType.SUPPORTS
-                probs = {"SUPPORTS": 0.65, "REFUTES": 0.12, "NEUTRAL": 0.23}
-            else:
-                stance = StanceType.NEUTRAL
-                probs = {"SUPPORTS": 0.15, "REFUTES": 0.15, "NEUTRAL": 0.70}
+            # Without explicit entailment or contradiction cues, topical token overlap
+            # indicates relevance, NOT entailment. Default safely to NEUTRAL.
+            stance = StanceType.NEUTRAL
+            probs = {"SUPPORTS": 0.10, "REFUTES": 0.10, "NEUTRAL": 0.80}
 
         return stance, probs
 

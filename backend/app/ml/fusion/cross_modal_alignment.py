@@ -41,6 +41,15 @@ class CrossModalAlignmentChecker:
             alignment_score -= 0.30
             notes.append("Localized visual splicing detected via ELA, indicating image alteration.")
 
+        # 4. Video forensics checks (synthetic face & frame rate anomalies)
+        if video_forensics:
+            if video_forensics.synthetic_face_probability is not None and video_forensics.synthetic_face_probability > 0.75:
+                alignment_score -= 0.25
+                notes.append("Elevated synthetic face probability in video reduces cross-modal evidentiary reliability.")
+            if video_forensics.inconsistent_frame_rate:
+                alignment_score -= 0.15
+                notes.append("Inconsistent frame rate detected across video keyframes, suggesting potential editing or splicing.")
+
         clamped = float(round(max(0.05, min(1.0, alignment_score)), 3))
         return clamped, notes
 

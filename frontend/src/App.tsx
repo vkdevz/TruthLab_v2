@@ -117,20 +117,28 @@ export function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const handleFileSelect = (file: File | null) => {
+    setSelectedFile(file);
+    setFilePreviewUrl((prev) => {
+      if (prev) {
+        URL.revokeObjectURL(prev);
+      }
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
+
   useEffect(() => {
-    if (selectedFile) {
-      const objectUrl = URL.createObjectURL(selectedFile);
-      setFilePreviewUrl(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    } else {
-      setFilePreviewUrl(null);
-    }
-  }, [selectedFile]);
+    return () => {
+      if (filePreviewUrl) {
+        URL.revokeObjectURL(filePreviewUrl);
+      }
+    };
+  }, [filePreviewUrl]);
 
   const handleReset = () => {
     setInputText('');
     setInputUrl('');
-    setSelectedFile(null);
+    handleFileSelect(null);
     setOverallVerdict(null);
     setVerifiedClaims([]);
     setEvidenceGraph(null);
@@ -146,10 +154,10 @@ export function App() {
     setErrorMsg(null);
     if (preset.modality === 'URL') {
       setInputUrl(preset.payload);
-      setSelectedFile(null);
+      handleFileSelect(null);
     } else if (preset.modality === 'TEXT') {
       setInputText(preset.payload);
-      setSelectedFile(null);
+      handleFileSelect(null);
     } else if (preset.modality === 'IMAGE' || preset.modality === 'VIDEO') {
       try {
         const response = await fetch(preset.payload);
@@ -157,7 +165,7 @@ export function App() {
         const filename = preset.payload.split('/').pop() || 'sample_media';
         const mimeType = preset.modality === 'IMAGE' ? 'image/png' : 'video/mp4';
         const file = new File([blob], filename, { type: blob.type || mimeType });
-        setSelectedFile(file);
+        handleFileSelect(file);
       } catch (err) {
         console.error('Failed to load preset media:', err);
       }
@@ -373,7 +381,7 @@ export function App() {
                       type="file"
                       id="file-upload-input"
                       accept={activeTab === 'IMAGE' ? 'image/*' : 'video/*'}
-                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                      onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
                       style={{ display: 'none' }}
                     />
                     <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 500, marginBottom: '4px' }}>

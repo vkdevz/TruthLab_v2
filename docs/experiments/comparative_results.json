@@ -41,14 +41,14 @@
     "extra_params": {}
   },
   "environment": {
-    "timestamp_utc": "2026-10-12T13:40:07.910281+00:00",
+    "timestamp_utc": "2026-11-10T09:12:54.327028+00:00",
     "python_version": "3.12.6",
     "python_executable": "/Users/pankajkumar/Desktop/Major Project/v2/.venv/bin/python3.12",
     "platform": "macOS-26.6.2-arm64-arm-64bit",
     "processor": "arm",
     "cpu_count": 8,
     "git": {
-      "commit": "032af78fab156dc0b99cfd7d05d997a51b8a206f",
+      "commit": "c8197f424223b38fc67168e1e58d3c04937ceedd",
       "branch": "main",
       "dirty": true
     },
@@ -64,7 +64,7 @@
       "trafilatura": "2.3.0"
     }
   },
-  "elapsed_seconds": 4.4936,
+  "elapsed_seconds": 1.4612,
   "results": {
     "benchmark_type": "RESEARCH_BENCHMARK",
     "sample_count": 15,
@@ -202,7 +202,7 @@
         "id": "claim_ins_003",
         "predicted_5class": "INSUFFICIENT_EVIDENCE",
         "predicted_binary": 1,
-        "confidence": 0.45,
+        "confidence": 0.3,
         "evidence_count": 0,
         "supporting_count": 0,
         "refuting_count": 0,
@@ -213,7 +213,7 @@
         "id": "claim_ins_012",
         "predicted_5class": "INSUFFICIENT_EVIDENCE",
         "predicted_binary": 1,
-        "confidence": 0.45,
+        "confidence": 0.3,
         "evidence_count": 0,
         "supporting_count": 0,
         "refuting_count": 0,
@@ -224,7 +224,7 @@
         "id": "claim_ins_008",
         "predicted_5class": "INSUFFICIENT_EVIDENCE",
         "predicted_binary": 1,
-        "confidence": 0.45,
+        "confidence": 0.3,
         "evidence_count": 0,
         "supporting_count": 0,
         "refuting_count": 0,
@@ -235,34 +235,34 @@
         "id": "claim_mis_006",
         "predicted_5class": "MISLEADING",
         "predicted_binary": 1,
-        "confidence": 0.7,
+        "confidence": 0.8,
         "evidence_count": 1,
         "supporting_count": 0,
         "refuting_count": 0,
         "temporal_status": "CURRENT",
-        "explanation": "Evidence is conflicting or non-conclusive across sources."
+        "explanation": "Evidence is conflicting across polarized sources."
       },
       {
         "id": "claim_mis_010",
         "predicted_5class": "MISLEADING",
         "predicted_binary": 1,
-        "confidence": 0.7,
+        "confidence": 0.8,
         "evidence_count": 1,
         "supporting_count": 0,
         "refuting_count": 0,
         "temporal_status": "UNKNOWN",
-        "explanation": "Evidence is conflicting or non-conclusive across sources."
+        "explanation": "Evidence is conflicting across polarized sources."
       },
       {
         "id": "claim_mis_012",
         "predicted_5class": "MISLEADING",
         "predicted_binary": 1,
-        "confidence": 0.7,
+        "confidence": 0.8,
         "evidence_count": 1,
         "supporting_count": 0,
         "refuting_count": 0,
         "temporal_status": "UNKNOWN",
-        "explanation": "Evidence is conflicting or non-conclusive across sources."
+        "explanation": "Evidence is conflicting across polarized sources."
       },
       {
         "id": "claim_out_004",
@@ -273,7 +273,7 @@
         "supporting_count": 0,
         "refuting_count": 1,
         "temporal_status": "OUTDATED",
-        "explanation": "Historical date '2017' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 3571 days to 2017-01-01. Geographic entity confirmed in evidence: united states Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+        "explanation": "Historical date '2017' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 3600 days to 2017-01-01. Geographic entity confirmed in evidence: united states Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
       },
       {
         "id": "claim_out_007",
@@ -294,8 +294,8 @@
         "evidence_count": 1,
         "supporting_count": 0,
         "refuting_count": 1,
-        "temporal_status": "OUTDATED",
-        "explanation": "Historical date '2001' corroborated directly within evidence text. Temporal recycling: statement presents event with breaking/current urgency, but underlying occurrence dates back 9415 days to 2001-01-01. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
+        "temporal_status": "CURRENT",
+        "explanation": "Historical date 'September 11' corroborated directly within evidence text. Authoritative evidence consensus refutes the claim (evidentiary refutation dominance)."
       },
       {
         "id": "claim_sup_002",

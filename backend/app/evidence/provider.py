@@ -119,11 +119,12 @@ class LocalClaimReviewProvider(EvidenceProvider):
                 else:
                     stance = raw_stance
 
-                probs = {
-                    "SUPPORTS": 0.92 if stance == StanceType.SUPPORTS else 0.03,
-                    "REFUTES": 0.92 if stance == StanceType.REFUTES else 0.03,
-                    "NEUTRAL": 0.05
-                }
+                if stance == StanceType.SUPPORTS:
+                    probs = {"SUPPORTS": 0.90, "REFUTES": 0.05, "NEUTRAL": 0.05}
+                elif stance == StanceType.REFUTES:
+                    probs = {"SUPPORTS": 0.05, "REFUTES": 0.90, "NEUTRAL": 0.05}
+                else:
+                    probs = {"SUPPORTS": 0.05, "REFUTES": 0.05, "NEUTRAL": 0.90}
 
                 date_val = None
                 date_str = rec.get("date")
@@ -239,12 +240,12 @@ class WikipediaEvidenceProvider(EvidenceProvider):
                     if refute_hits > support_hits and refute_hits >= 1:
                         stance = StanceType.REFUTES
                         probs = {"SUPPORTS": 0.05, "REFUTES": 0.90, "NEUTRAL": 0.05}
-                    elif support_hits >= 1:
+                    elif support_hits > refute_hits and support_hits >= 1:
                         stance = StanceType.SUPPORTS
                         probs = {"SUPPORTS": 0.90, "REFUTES": 0.05, "NEUTRAL": 0.05}
                     else:
-                        stance = StanceType.SUPPORTS
-                        probs = {"SUPPORTS": 0.85, "REFUTES": 0.05, "NEUTRAL": 0.10}
+                        stance = StanceType.NEUTRAL
+                        probs = {"SUPPORTS": 0.10, "REFUTES": 0.10, "NEUTRAL": 0.80}
 
                     computed_score = round(min(0.95, max(0.45, containment * 1.1)), 3)
 
@@ -335,9 +336,12 @@ class PublicWebSearchProvider(EvidenceProvider):
                         if refute_hits > support_hits and refute_hits >= 1:
                             stance = StanceType.REFUTES
                             probs = {"SUPPORTS": 0.05, "REFUTES": 0.90, "NEUTRAL": 0.05}
-                        else:
+                        elif support_hits > refute_hits and support_hits >= 1:
                             stance = StanceType.SUPPORTS
-                            probs = {"SUPPORTS": 0.85, "REFUTES": 0.05, "NEUTRAL": 0.10}
+                            probs = {"SUPPORTS": 0.90, "REFUTES": 0.05, "NEUTRAL": 0.05}
+                        else:
+                            stance = StanceType.NEUTRAL
+                            probs = {"SUPPORTS": 0.10, "REFUTES": 0.10, "NEUTRAL": 0.80}
 
                         computed_score = round(min(0.95, max(0.45, containment * 1.1)), 3)
 
@@ -396,8 +400,19 @@ class GoogleFactCheckProvider(EvidenceProvider):
                             rating = rev.get("textualRating", "")
                             snippet_text = f"Fact-check by {pub} on '{item.get('text', '')}': Rated '{rating}'."
 
-                            is_false = any(w in rating.lower() for w in ["false", "pants on fire", "incorrect", "misleading"])
-                            stance = StanceType.REFUTES if is_false else StanceType.SUPPORTS
+                            r_lower = rating.lower()
+                            refute_keywords = ["false", "pants on fire", "incorrect", "fake", "hoax", "debunked", "fabricated", "untrue", "satire", "manipulated"]
+                            support_keywords = ["true", "correct", "accurate", "verified", "confirmed"]
+
+                            if any(w in r_lower for w in refute_keywords):
+                                stance = StanceType.REFUTES
+                                probs = {"SUPPORTS": 0.05, "REFUTES": 0.90, "NEUTRAL": 0.05}
+                            elif any(w in r_lower for w in support_keywords):
+                                stance = StanceType.SUPPORTS
+                                probs = {"SUPPORTS": 0.90, "REFUTES": 0.05, "NEUTRAL": 0.05}
+                            else:
+                                stance = StanceType.NEUTRAL
+                                probs = {"SUPPORTS": 0.10, "REFUTES": 0.10, "NEUTRAL": 0.80}
 
                             results.append(EvidenceSnippet(
                                 id=f"gfc-{hashlib.md5(url.encode()).hexdigest()[:8]}",
@@ -409,11 +424,7 @@ class GoogleFactCheckProvider(EvidenceProvider):
                                 snippet_text=snippet_text,
                                 retrieval_score=0.88,
                                 stance=stance,
-                                stance_probabilities={
-                                    "SUPPORTS": 0.05 if is_false else 0.90,
-                                    "REFUTES": 0.90 if is_false else 0.05,
-                                    "NEUTRAL": 0.05
-                                },
+                                stance_probabilities=probs,
                                 is_claim_review=True,
                                 claim_review_rating=rating,
                                 provider=self.provider_name

@@ -84,7 +84,22 @@ class URLValidator:
                 detail=f"Forbidden port '{parsed.port}'. Permitted ports: {sorted(cls.ALLOWED_PORTS)}"
             )
 
-        # Check if hostname directly represents an IP literal
+        # Check if hostname directly represents an IP literal or obfuscated IP
+        if "0x" in hostname.lower():
+            raise HTTPException(
+                status_code=400,
+                detail=f"Obfuscated hexadecimal IP address formats ({hostname}) are strictly prohibited."
+            )
+
+        dot_parts = hostname.split(".")
+        if all(p.isdigit() for p in dot_parts) and 1 <= len(dot_parts) <= 4:
+            # Check for leading zero octal obfuscation or integer IP
+            if any(len(p) > 1 and p.startswith("0") for p in dot_parts) or len(dot_parts) < 4:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Obfuscated octal or non-canonical IP address formats ({hostname}) are strictly prohibited."
+                )
+
         try:
             direct_ip = ipaddress.ip_address(hostname)
             if cls._is_blocked_ip(direct_ip):

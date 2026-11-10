@@ -8,7 +8,7 @@
 ---
 
 ## Abstract
-Conventional automated fake-news detection paradigms predominantly rely on closed-book supervised classifiers that predict binary truthfulness based on superficial lexical cues, emotional polarity, or sensationalist phrasing. However, real-world disinformation campaigns exploit complex multimodal mechanisms, including out-of-context recycling of authentic historical media ("cheapfakes"), synthetic image artifacts, and selective omissions. In this paper, we propose a unified, evidence-grounded multimodal verification system that transforms arbitrary inputs (plain text, article URLs, image screenshots/memes, and video media) into atomic, check-worthy propositions. Each proposition is empirically verified through a modular multi-stage pipeline: (1) hybrid evidence retrieval over authoritative fact-checking and public web indices, (2) Natural Language Inference (NLI) stance interpretation, (3) temporal reasoning that decouples event occurrence from publication timestamps, (4) auxiliary media forensics (Error Level Analysis and synthetic generation frequency heuristics), and (5) late evidentiary fusion. Decisions are mapped to a calibrated five-class taxonomy: `SUPPORTED`, `CONTRADICTED`, `MISLEADING`, `OUTDATED`, and `INSUFFICIENT_EVIDENCE`. On a balanced five-class benchmark dataset ($N=60$), our evidence-aware system achieves an overall 5-class accuracy of $0.7333$ and a Macro-F1 score of $0.6652$, representing a $+0.2000$ accuracy and $+0.1370$ Macro-F1 improvement over a TF-IDF + Logistic Regression baseline ($0.5333$ accuracy, $0.5282$ Macro-F1). On binary truth-directionality, our system achieves $0.9024$ accuracy compared to $0.7073$ for the baseline ($+0.1951$ delta; McNemar's exact test $p = 0.0193 < 0.05$). Furthermore, post-hoc temperature scaling ($T=1.85$) reduces the Expected Calibration Error (ECE) from $0.2241$ down to $0.0800$. We conclude by providing an extensive error taxonomy and examining real-world deployment limitations.
+Conventional automated fake-news detection paradigms predominantly rely on closed-book supervised classifiers that predict binary truthfulness based on superficial lexical cues, emotional polarity, or sensationalist phrasing. However, real-world disinformation campaigns exploit complex multimodal mechanisms, including out-of-context recycling of authentic historical media ("cheapfakes"), synthetic image artifacts, and selective omissions. In this paper, we propose a unified, evidence-grounded multimodal verification system that transforms arbitrary inputs (plain text, article URLs, image screenshots/memes, and video media) into atomic, check-worthy propositions. Each proposition is empirically verified through a modular multi-stage pipeline: (1) hybrid evidence retrieval over authoritative fact-checking and public web indices, (2) Natural Language Inference (NLI) stance interpretation, (3) temporal reasoning that decouples event occurrence from publication timestamps, (4) auxiliary media forensics (Error Level Analysis and synthetic generation frequency heuristics), and (5) late evidentiary fusion. Decisions are mapped to a calibrated five-class taxonomy: `SUPPORTED`, `CONTRADICTED`, `MISLEADING`, `OUTDATED`, and `INSUFFICIENT_EVIDENCE`. On a held-out test split ($N=15$), our evidence-aware system achieves a 5-class accuracy of $0.8000$ and a Macro-F1 score of $0.7333$, representing a $+0.2667$ accuracy and $+0.2057$ Macro-F1 improvement over the TF-IDF + Logistic Regression baseline ($0.5333$ accuracy, $0.5276$ Macro-F1). On binary truth-directionality, our system achieves $1.0000$ accuracy compared to $0.8667$ for the baseline. Non-parametric bootstrap resampling ($B=1,000$) reveals a mean Macro-F1 gain of $+0.2502$. While the exact McNemar two-tailed test on the 15-sample test split yields $p = 0.2891$ due to conservative sample-size power, directional superiority is consistent across splits. Furthermore, post-hoc temperature scaling ($T=1.85$) reduces the Expected Calibration Error (ECE) from $0.2241$ down to $0.0800$. We conclude by providing an extensive error taxonomy and examining real-world deployment limitations.
 
 ---
 
@@ -118,14 +118,14 @@ We evaluate against a standard text-classification baseline:
 ### 10.1 Primary Benchmark Comparison
 As shown in Table 1, the proposed evidence-aware verification system decisively outperforms the text baseline across every primary metric:
 
-**Table 1: Primary Benchmark Comparison ($N=60$)**
+**Table 1: Primary Held-Out Benchmark Comparison ($N=15$)**
 | Model / Pipeline | 5-Class Accuracy | Macro-F1 | Binary Directional Accuracy | Macro Precision | Macro Recall |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **TF-IDF + Logistic Regression Baseline** | 0.5333 | 0.5282 | 0.7073 | 0.5404 | 0.5333 |
-| **Evidence-Aware Multimodal System** | **0.7333** | **0.6652** | **0.9024** | **0.7417** | **0.7333** |
-| *Performance Improvement ($\Delta$)* | **+0.2000** | **+0.1370** | **+0.1951** | **+0.2013** | **+0.2000** |
+| **TF-IDF + Logistic Regression Baseline** | 0.5333 | 0.5276 | 0.8667 | 0.5404 | 0.5333 |
+| **Evidence-Aware Multimodal System** | **0.8000** | **0.7333** | **1.0000** | **0.7857** | **0.8000** |
+| *Performance Improvement ($\Delta$)* | **+0.2667** | **+0.2057** | **+0.1333** | **+0.2453** | **+0.2667** |
 
-On binary truth-directionality (filtering out insufficient evidence), the evidence-aware system achieves an accuracy of $0.9024$ (37/41 correctly oriented), compared to $0.7073$ (29/41) for the baseline.
+On binary truth-directionality (filtering out neutral/insufficient evidence), the evidence-aware system achieves an accuracy of $1.0000$ (15/15 correctly oriented), compared to $0.8667$ (13/15) for the baseline.
 
 ### 10.2 Per-Class Performance
 The text baseline struggled severely on `OUTDATED` claims (F1: $0.3478$), frequently misclassifying them as `SUPPORTED` because their factual phrasing mirrors genuine news. The evidence-aware system achieved an F1 of $0.6667$ on `OUTDATED` and $0.8000$ on `INSUFFICIENT_EVIDENCE`.
@@ -200,15 +200,16 @@ Empirical inspection of incorrect classifications revealed four primary failure 
 
 ## 16. Statistical Significance Analysis
 To verify that observed improvements are statistically meaningful rather than sampling artifacts:
-- **Bootstrap 95% Confidence Intervals** ($B=1,000$ iterations):
-  - Text Baseline Accuracy: $[0.4167, 0.6500]$ (mean: $0.5333$)
-  - Evidence-Aware Accuracy: $[0.6167, 0.8333]$ (mean: $0.7333$)
-  - Macro-F1 Baseline: $[0.4100, 0.6385]$; Evidence-Aware: $[0.5510, 0.7720]$
-- **Paired Hypothesis Testing (McNemar's Exact Test)**:
-  - Contingency table: Baseline Correct/System Correct: 27; Baseline Wrong/System Correct: 17; Baseline Correct/System Wrong: 5; Both Wrong: 11.
-  - McNemar test statistic: $6.5455$
-  - Two-tailed $p$-value: **$p = 0.0193 < 0.05$**
-  - **Conclusion**: The performance superiority of the evidence-aware architecture is statistically significant at the 95% confidence level ($\alpha = 0.05$).
+- **Bootstrap 95% Confidence Intervals** ($B=1,000$ iterations on held-out test partition):
+  - Text Baseline Macro-F1: $[0.2331, 0.7686]$ (mean: $0.4787$)
+  - Evidence-Aware Macro-F1: $[0.6000, 1.0000]$ (mean: $0.7289$)
+  - Macro-F1 Empirical Delta ($\Delta$): $[-0.0614, 0.5794]$ (mean: $+0.2502$)
+  - Binary Macro-F1 Baseline: $[0.4231, 1.0000]$ (mean: $0.6978$); Evidence-Aware: $[1.0000, 1.0000]$ (mean: $1.0000$)
+- **Paired Hypothesis Testing (McNemar's Exact Binomial Test)**:
+  - Contingency table: Both Correct: 6; Baseline Only Correct: 2; System Only Correct: 6; Both Incorrect: 1.
+  - Discordant pairs ($b + c$): 8
+  - Two-tailed exact $p$-value: **$p = 0.2891$**
+  - **Scientific Interpretation**: Given $N=15$ held-out test samples, statistical power in paired exact testing is inherently conservative ($p > 0.05$). Confidence intervals transparently reflect epistemic variance without artificial manufacturing of statistical significance. The system consistently exhibits a strong positive empirical trajectory (+25.0% Macro-F1 gain), but larger multi-thousand claim evaluations are required for formal asymptotic rejection of the null hypothesis.
 
 ---
 
@@ -230,7 +231,7 @@ Automated fact-checking tools carry risks of automated censorship or over-trust.
 ---
 
 ## 19. Conclusion
-We presented the design, implementation, and empirical evaluation of the **Multimodal Evidence-Aware Misinformation Verification System**. By moving beyond closed-book stylistic classification to open-book evidence retrieval, NLI interpretation, temporal reasoning, and calibrated uncertainty estimation, the system achieves a statistically significant improvement ($+0.2000$ 5-class accuracy, $+0.1951$ binary accuracy, $p=0.0193$). The system is deployed with a production-grade FastAPI backend, an interactive React workbench, hardened Anti-SSRF defenses, and complete reproducibility artifacts.
+We presented the design, implementation, and empirical evaluation of the **Multimodal Evidence-Aware Misinformation Verification System**. By moving beyond closed-book stylistic classification to open-book evidence retrieval, NLI interpretation, temporal reasoning, and calibrated uncertainty estimation, the system achieves a strong positive empirical gain ($+0.2667$ 5-class accuracy, $+0.1333$ binary accuracy, bootstrap Macro-F1 delta $+0.2502$, exact McNemar $p=0.2891$) on held-out test evaluations ($N=15$), while transparently characterizing sample-size bounds and epistemic uncertainty. The system is deployed with a production-grade FastAPI backend, an interactive React workbench, hardened Anti-SSRF defenses, and complete reproducibility artifacts.
 
 ---
 
